@@ -6,7 +6,10 @@ import static codigo.Tokens.*;
 L=[a-zA-Z]+
 G=[_]+
 D=[0-9]+
+P=[.]
+S=[+-]
 espacio=[ ,\t,\r,\n]+
+
 %{
     public String lexeme;
 %}
@@ -333,7 +336,7 @@ RECONFIGURE |
 RECURSIVE |
 REF |
 REFERENCES |
-REFERENCING
+REFERENCING |
 REGR_AVGX |
 REGR_COUNT |
 REGR_INTERCEPT |
@@ -496,40 +499,46 @@ XMLTEXT |
 XMLVALIDATE |
 YEAR |
 ZONE {lexeme=yytext(); return Reservadas;}
+
 {espacio} {/*Ignore*/}
 "--".* {/*Ignore*/}
-"'" {return Cadena;}
-"||" {return Simbolo;}
+"/*" [^*] ~"*/" {/*Ignore*/}
+"'" .* "'" {lexeme=yytext(); return Cadena;}
 {L}({L}|{D}|{G})* {lexeme=yytext(); return Identificador;}
-("(-"{D}+")")|{D}+ {lexeme=yytext(); return Entero;}
-{D}+{[.]}*{D}+ {lexeme=yytext(); return Decimal;}
-+ |
-- |
-* |
-/ |
-% |
-< |
-<= |
-> |
->= |
-= |
-== |
-!= |
-&& |
-! |
-; |
-, |
-. |
-[ |
-] |
-( |
-) |
-{ |
-} |
-[] |
-() |
-{} |
-@ |
-# |
-## {lexeme=yytext(); return Caracteres;}
+{S}?{D}+ {lexeme=yytext(); return Entero;}
+{S}?{D}+{P}{D}+ {lexeme=yytext(); return Decimal;}
+{S}?{D}*({P}?{D}*)?"E"{S}?{D}*({P}?{D}*)? {lexeme=yytext(); return Exponencial;}
+
+"+" {lexeme=yytext(); return Suma;}
+"-" {lexeme=yytext(); return Resta;}
+"*" {lexeme=yytext(); return Multiplicacion;}
+"/" {lexeme=yytext(); return Division;}
+
+"%" |
+"<" |
+"<=" |
+">" |
+">=" |
+"=" |
+"==" |
+"!=" |
+"&&" |
+"||" |
+"!" |
+";" |
+"," |
+"." |
+"[" |
+"]" |
+"[]" |
+"(" |
+")" |
+"()" |
+"{" |
+"}" |
+"{}" |
+"@" |
+"#" |    
+"##" {lexeme=yytext(); return Caracteres;}
+
  . {return ERROR;}
