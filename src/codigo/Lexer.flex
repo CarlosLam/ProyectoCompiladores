@@ -5,12 +5,12 @@ import static codigo.Tokens.*;
 %type Tokens
 %column
 %line
-L=[a-zA-Z]+
-G=[_]+
-D=[0-9]+
+L=[a-zA-Z]
+G=[_]
+D=[0-9]
 P=[.]
 S=[+-]
-espacio=[ ,\t,\r,\n]+
+espacio=[ ,\t,\r,\n]
 
 %{
     public String lexeme;
@@ -509,11 +509,11 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 "--".* {/*Ignore*/}
 "/*" [^*] ~"*/" {/*Ignore*/}
 
-"'" .* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
+"'" ({L}*|[ ]*)* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 "'" .* "'" {lexeme=yytext(); lin=yyline; return ErrorCadena;}
 "'" .* {lin=yyline; return ErrorApertura;}
 
-{L}({L}|{D}){31} {lexeme=yytext(); lin=yyline; col=yycolumn; return IdentificadorOver;}
+{L}({L}|{D}){31,100} {lexeme=yytext(); lin=yyline; col=yycolumn; return IdentificadorOver;}
 {L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Identificador;}
 
 {D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return Entero;}
@@ -521,7 +521,7 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 {D}+{P}{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Decimal;}
 {P}{D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return ErrorDecimal;}
 
-{S}?{D}*({P}?{D}*)?("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Exponencial;}
+{D}+({P}?{D}*)?("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Exponencial;}
 {P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return ErrorExponencial;}
 
 "+" {lexeme=yytext(); lin=yyline; col=yycolumn; return Suma;}

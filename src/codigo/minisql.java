@@ -5,7 +5,14 @@
  */
 package codigo;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -68,7 +75,7 @@ public class minisql extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnLoadFlex)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 305, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 502, Short.MAX_VALUE)
                         .addComponent(btnCargarSQL)
                         .addGap(24, 24, 24))))
         );
@@ -80,7 +87,7 @@ public class minisql extends javax.swing.JFrame {
                     .addComponent(btnLoadFlex)
                     .addComponent(btnCargarSQL))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -102,10 +109,49 @@ public class minisql extends javax.swing.JFrame {
 
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
-        try
-        {
+        File archivo;
+        JFileChooser dialogo = new JFileChooser();
+        String rutaArchivo = "";
+
+        int valor = dialogo.showOpenDialog(this);
+        if (valor == JFileChooser.APPROVE_OPTION) {
+            //Obtener la direccion del documento
+            archivo = dialogo.getSelectedFile();
+            rutaArchivo = archivo.getPath();
+            String result = "";
             
-        }catch(Exception e){}
+            try {
+                //Comenzar con la lectura del documento
+                Reader lector = new BufferedReader(new FileReader(archivo));
+                Lexer lexer = new Lexer(lector);
+                
+                while (true) {
+                    Tokens tokens = lexer.yylex();
+                    if (tokens == null) {
+                        return;
+                    }
+                    
+                    switch (tokens) {
+                        case ERROR:
+                            result += lexer.lexeme +"\n";
+                            break;
+                        case IdentificadorOver:
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR. MAX LONGITUD. Nuevo token: " + lexer.lexeme.substring(0, 31)+ "\n";
+                            break;
+                        default:
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + ": Es " + tokens.toString().toUpperCase() + "\n";
+                            break;
+                    }
+                    txtRespuesta.setText(result);
+                }
+                
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }   
         
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 

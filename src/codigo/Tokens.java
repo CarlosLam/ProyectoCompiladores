@@ -24,5 +24,7 @@ public enum Tokens {
     ErrorDecimal,
     IdentificadorOver,
     ErrorApertura,
+    ErrorExponencial,
+    ErrorCadena,
     ERROR
 }
