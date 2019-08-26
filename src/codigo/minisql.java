@@ -102,6 +102,10 @@ public class minisql extends javax.swing.JFrame {
 
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
+        try
+        {
+            
+        }catch(Exception e){}
         
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 

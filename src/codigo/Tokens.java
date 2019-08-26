@@ -21,5 +21,8 @@ public enum Tokens {
     Multiplicacion,
     Division,
     Caracteres,
+    ErrorDecimal,
+    IdentificadorOver,
+    ErrorApertura,
     ERROR
 }

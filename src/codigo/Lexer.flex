@@ -3,6 +3,8 @@ import static codigo.Tokens.*;
 %%
 %class Lexer
 %type Tokens
+%column
+%line
 L=[a-zA-Z]+
 G=[_]+
 D=[0-9]+
@@ -12,6 +14,9 @@ espacio=[ ,\t,\r,\n]+
 
 %{
     public String lexeme;
+    public int col;
+    public int lin;
+
 %}
 %%
 ABSOLUTE |
@@ -498,21 +503,31 @@ XMLTABLE |
 XMLTEXT |
 XMLVALIDATE |
 YEAR |
-ZONE {lexeme=yytext(); return Reservadas;}
+ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 
 {espacio} {/*Ignore*/}
 "--".* {/*Ignore*/}
 "/*" [^*] ~"*/" {/*Ignore*/}
-"'" .* "'" {lexeme=yytext(); return Cadena;}
-{L}({L}|{D}|{G})* {lexeme=yytext(); return Identificador;}
-{S}?{D}+ {lexeme=yytext(); return Entero;}
-{S}?{D}+{P}{D}+ {lexeme=yytext(); return Decimal;}
-{S}?{D}*({P}?{D}*)?"E"{S}?{D}*({P}?{D}*)? {lexeme=yytext(); return Exponencial;}
 
-"+" {lexeme=yytext(); return Suma;}
-"-" {lexeme=yytext(); return Resta;}
-"*" {lexeme=yytext(); return Multiplicacion;}
-"/" {lexeme=yytext(); return Division;}
+"'" .* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
+"'" .* "'" {lexeme=yytext(); lin=yyline; return ErrorCadena;}
+"'" .* {lin=yyline; return ErrorApertura;}
+
+{L}({L}|{D}){31} {lexeme=yytext(); lin=yyline; col=yycolumn; return IdentificadorOver;}
+{L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Identificador;}
+
+{D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return Entero;}
+
+{D}+{P}{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Decimal;}
+{P}{D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return ErrorDecimal;}
+
+{S}?{D}*({P}?{D}*)?("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Exponencial;}
+{P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return ErrorExponencial;}
+
+"+" {lexeme=yytext(); lin=yyline; col=yycolumn; return Suma;}
+"-" {lexeme=yytext(); lin=yyline; col=yycolumn; return Resta;}
+"*" {lexeme=yytext(); lin=yyline; col=yycolumn; return Multiplicacion;}
+"/" {lexeme=yytext(); lin=yyline; col=yycolumn; return Division;}
 
 "%" |
 "<" |
@@ -539,6 +554,6 @@ ZONE {lexeme=yytext(); return Reservadas;}
 "{}" |
 "@" |
 "#" |    
-"##" {lexeme=yytext(); return Caracteres;}
+"##" {lexeme=yytext(); lin=yyline; col=yycolumn; return Caracteres;}
 
- . {return ERROR;}
+ . {lexeme=yytext(); lin=yyline; col=yycolumn; return ERROR;}
