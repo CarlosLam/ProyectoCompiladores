@@ -6,9 +6,11 @@
 package codigo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.logging.Level;
@@ -112,7 +114,8 @@ public class minisql extends javax.swing.JFrame {
         File archivo;
         JFileChooser dialogo = new JFileChooser();
         String rutaArchivo = "";
-
+        FileNameExtensionFilter filtro=new FileNameExtensionFilter("Archivo SQL","sql");
+        dialogo.setFileFilter(filtro);
         int valor = dialogo.showOpenDialog(this);
         if (valor == JFileChooser.APPROVE_OPTION) {
             //Obtener la direccion del documento
@@ -124,35 +127,59 @@ public class minisql extends javax.swing.JFrame {
                 //Comenzar con la lectura del documento
                 Reader lector = new BufferedReader(new FileReader(archivo));
                 Lexer lexer = new Lexer(lector);
-                
                 while (true) {
                     Tokens tokens = lexer.yylex();
                     if (tokens == null) {
-                        return;
+                        break;
                     }
                     
                     switch (tokens) {
                         case ERROR:
-                            result += lexer.lexeme +"\n";
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" +"ERROR\t"+ lexer.lexeme + " caracter no valido" +"\n";
+                            break;
+                        case ErrorMultilinea:
+                            result += "Linea " + lexer.lin + "\tERROR\tNo se encuentra apertura/cerradura de comentario multilinea\n";
                             break;
                         case IdentificadorOver:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR. MAX LONGITUD. Nuevo token: " + lexer.lexeme.substring(0, 31)+ "\n";
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme.substring(0, 31) + ".\t"+ "ERROR. MAX LONGITUD. Nuevo token: " + "\n";
+                            break;
+                        case ErrorCadena:
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR \t" + "La siguiente cadena contiene un caracter no valido" + lexer.lexeme + "\n";
+                            break;
+                        case ErrorApertura:
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR\t" + "Falta terminar la siguiente cadena." + lexer.lexeme + "\n";
                             break;
                         default:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + ": Es " + tokens.toString().toUpperCase() + "\n";
+                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + "\t" + "Es " + tokens.toString().toUpperCase() + "\n";
                             break;
                     }
                     txtRespuesta.setText(result);
                 }
-                
+                //File archivoOut = new File
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+                String rutaSalida = rutaArchivo;
+                rutaSalida = rutaSalida.substring(0, (rutaSalida.length() - 4));
+                rutaSalida += ".out";
+                
+                File n = new File(rutaSalida);
+            try {
+                if(!n.exists()){
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(n));
+                    bw.close();
+                }
+                
+                FileWriter TextOut = new FileWriter(n, false);
+                TextOut.write(result + "\r\n");
+                TextOut.close();   
+                
+            } catch (IOException ex) {
+                Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }   
-        
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 
     /**

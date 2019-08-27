@@ -21,10 +21,10 @@ public enum Tokens {
     Multiplicacion,
     Division,
     Caracteres,
-    ErrorDecimal,
+    Booleano,
     IdentificadorOver,
     ErrorApertura,
-    ErrorExponencial,
     ErrorCadena,
+    ErrorMultilinea,
     ERROR
 }

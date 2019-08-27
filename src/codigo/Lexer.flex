@@ -507,9 +507,11 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 
 {espacio} {/*Ignore*/}
 "--".* {/*Ignore*/}
-"/*" [^*] ~"*/" {/*Ignore*/}
+"/*" ~"*/" {/*Ignore*/}
+"/*" .*|
+"*/" .* {lin=yyline; return ErrorMultilinea;}
 
-"'" ({L}*|[ ]*)* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
+"'" ({L}*|[ ,\t]*)* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 "'" .* "'" {lexeme=yytext(); lin=yyline; return ErrorCadena;}
 "'" .* {lin=yyline; return ErrorApertura;}
 
@@ -519,10 +521,8 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 {D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return Entero;}
 
 {D}+{P}{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Decimal;}
-{P}{D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return ErrorDecimal;}
 
 {D}+({P}?{D}*)?("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Exponencial;}
-{P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return ErrorExponencial;}
 
 "+" {lexeme=yytext(); lin=yyline; col=yycolumn; return Suma;}
 "-" {lexeme=yytext(); lin=yyline; col=yycolumn; return Resta;}
@@ -556,4 +556,7 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 "#" |    
 "##" {lexeme=yytext(); lin=yyline; col=yycolumn; return Caracteres;}
 
+"0" |
+"1" |
+"NULL" {lexeme=yytext(); lin=yyline; col=yycolumn; return Booleano;}
  . {lexeme=yytext(); lin=yyline; col=yycolumn; return ERROR;}
