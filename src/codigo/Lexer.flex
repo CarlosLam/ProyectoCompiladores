@@ -513,7 +513,7 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 
 "'" ({L}|[ ,\t]|{D}|{G}|{S}|{P})* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 "'" .* "'" {lexeme=yytext(); lin=yyline; return ErrorCadena;}
-
+("'"([^'\r\n]*)) {lexeme=yytext(); lin=yyline; return ErrorApertura;}
 {L}({L}|{D}){31,100} {lexeme=yytext(); lin=yyline; col=yycolumn; return IdentificadorOver;}
 {L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Identificador;}
 

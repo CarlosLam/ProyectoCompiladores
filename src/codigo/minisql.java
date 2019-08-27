@@ -165,9 +165,9 @@ public class minisql extends javax.swing.JFrame {
                         case ErrorCadena:
                             result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR \t" + "La siguiente cadena contiene un caracter no valido" + lexer.lexeme + "\n";
                             break;
-//                        case ErrorApertura:
-//                            result += "Linea " + lexer.lin + ".\t" + "ERROR\t" + "Falta terminar la cadena en esta línea" + lexer.lexeme + "\n";
-//                            break;
+                        case ErrorApertura:
+                            result += "Linea " + lexer.lin + ".\t" + "ERROR\t" + "Falta terminar la cadena en esta línea" + lexer.lexeme + "\n";
+                            break;
                         default:
                             result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + "\t" + "Es " + tokens.toString().toUpperCase() + "\n";
                             break;
