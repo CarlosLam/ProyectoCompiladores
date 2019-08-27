@@ -91,7 +91,7 @@ public class minisql extends javax.swing.JFrame {
                         .addComponent(btnCargarSQL)
                         .addGap(24, 24, 24))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 878, Short.MAX_VALUE)
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -102,7 +102,7 @@ public class minisql extends javax.swing.JFrame {
                     .addComponent(btnLoadFlex)
                     .addComponent(btnCargarSQL))
                 .addGap(48, 48, 48)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -165,9 +165,9 @@ public class minisql extends javax.swing.JFrame {
                         case ErrorCadena:
                             result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR \t" + "La siguiente cadena contiene un caracter no valido" + lexer.lexeme + "\n";
                             break;
-                        case ErrorApertura:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR\t" + "Falta terminar la siguiente cadena." + lexer.lexeme + "\n";
-                            break;
+//                        case ErrorApertura:
+//                            result += "Linea " + lexer.lin + ".\t" + "ERROR\t" + "Falta terminar la cadena en esta línea" + lexer.lexeme + "\n";
+//                            break;
                         default:
                             result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + "\t" + "Es " + tokens.toString().toUpperCase() + "\n";
                             break;

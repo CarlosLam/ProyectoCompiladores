@@ -33,7 +33,7 @@
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <Component id="jScrollPane2" pref="714" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" pref="878" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -49,7 +49,7 @@
                   <Component id="btnCargarSQL" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="358" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="412" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
