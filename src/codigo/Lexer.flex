@@ -511,7 +511,7 @@ ZONE {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
 "/*" .*|
 "*/" .* {lin=yyline; return ErrorMultilinea;}
 
-"'" ({L}*|[ ,\t]*)* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
+"'" ({L}*|[ ,\t]*|{D}*|{G}*|{S}*|{P]*)* "'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 "'" .* "'" {lexeme=yytext(); lin=yyline; return ErrorCadena;}
 "'" .* {lin=yyline; return ErrorApertura;}
 

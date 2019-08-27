@@ -13,10 +13,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -29,6 +31,8 @@ public class minisql extends javax.swing.JFrame {
      */
     public minisql() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        
     }
 
     /**
@@ -42,8 +46,8 @@ public class minisql extends javax.swing.JFrame {
 
         btnLoadFlex = new javax.swing.JButton();
         btnCargarSQL = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtRespuesta = new javax.swing.JTextArea();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblFinal = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,9 +65,18 @@ public class minisql extends javax.swing.JFrame {
             }
         });
 
-        txtRespuesta.setColumns(20);
-        txtRespuesta.setRows(5);
-        jScrollPane1.setViewportView(txtRespuesta);
+        tblFinal.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tblFinal);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -73,23 +86,23 @@ public class minisql extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(btnLoadFlex)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 502, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnCargarSQL)
-                        .addGap(24, 24, 24))))
+                        .addGap(24, 24, 24))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLoadFlex)
                     .addComponent(btnCargarSQL))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
+                .addGap(48, 48, 48)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -105,12 +118,18 @@ public class minisql extends javax.swing.JFrame {
         if (valor == JFileChooser.APPROVE_OPTION) {
             File archivo = dialogo.getSelectedFile();
             JFlex.Main.generate(archivo);
-            txtRespuesta.setText(archivo.toString());
         }
     }//GEN-LAST:event_btnLoadFlexActionPerformed
 
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
+        
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Lineas y Columnas");
+        model.addColumn("Palabra");
+        model.addColumn("Token");
+        tblFinal.setModel(model);
+        
         File archivo;
         JFileChooser dialogo = new JFileChooser();
         String rutaArchivo = "";
@@ -153,7 +172,6 @@ public class minisql extends javax.swing.JFrame {
                             result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + "\t" + "Es " + tokens.toString().toUpperCase() + "\n";
                             break;
                     }
-                    txtRespuesta.setText(result);
                 }
                 //File archivoOut = new File
             } catch (FileNotFoundException ex) {
@@ -161,21 +179,31 @@ public class minisql extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
-                String rutaSalida = rutaArchivo;
-                rutaSalida = rutaSalida.substring(0, (rutaSalida.length() - 4));
-                rutaSalida += ".out";
-                
-                File n = new File(rutaSalida);
+            
+            String rutaSalida = rutaArchivo;
+            rutaSalida = rutaSalida.substring(0, (rutaSalida.length() - 4));
+            rutaSalida += ".out";
+
+            File n = new File(rutaSalida);
             try {
                 if(!n.exists()){
                     BufferedWriter bw = new BufferedWriter(new FileWriter(n));
                     bw.close();
                 }
                 
+                //Creacion del archivo .OUT
                 FileWriter TextOut = new FileWriter(n, false);
                 TextOut.write(result + "\r\n");
-                TextOut.close();   
+                TextOut.close();
                 
+                //Añadir la data al table
+                String[] lineas = result.split("\\n");
+                String[] data;
+                
+                for (int i = 0; i < lineas.length; i++) {
+                    data = lineas[i].split("\\t");
+                    model.addRow(data);
+                }
             } catch (IOException ex) {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -220,7 +248,7 @@ public class minisql extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCargarSQL;
     private javax.swing.JButton btnLoadFlex;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea txtRespuesta;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tblFinal;
     // End of variables declaration//GEN-END:variables
 }
