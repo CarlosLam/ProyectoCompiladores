@@ -180,32 +180,13 @@ public class minisql extends javax.swing.JFrame {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            String rutaSalida = rutaArchivo;
-            rutaSalida = rutaSalida.substring(0, (rutaSalida.length() - 4));
-            rutaSalida += ".out";
+            //Añadir la data al table
+            String[] lineas = result.split("\\n");
+            String[] data;
 
-            File n = new File(rutaSalida);
-            try {
-                if(!n.exists()){
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(n));
-                    bw.close();
-                }
-                
-                //Creacion del archivo .OUT
-                FileWriter TextOut = new FileWriter(n, false);
-                TextOut.write(result + "\r\n");
-                TextOut.close();
-                
-                //Añadir la data al table
-                String[] lineas = result.split("\\n");
-                String[] data;
-                
-                for (int i = 0; i < lineas.length; i++) {
-                    data = lineas[i].split("\\t");
-                    model.addRow(data);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
+            for (int i = 0; i < lineas.length; i++) {
+                data = lineas[i].split("\\t");
+                model.addRow(data);
             }
         }   
     }//GEN-LAST:event_btnCargarSQLActionPerformed
