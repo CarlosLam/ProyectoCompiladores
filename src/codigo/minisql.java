@@ -6,21 +6,16 @@
 package codigo;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Locale;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -167,28 +162,51 @@ public class minisql extends javax.swing.JFrame {
             
             boolean error = false;
             String[] sentencias = result.split("; JMP CARACTERES\\n");                  //Separacion de las 8 sentencias posibles mediante ';'
-            
-            for (int i = 0; i<sentencias.length;i++) {//Recorremos las sentencias
-                Palabras = sentencias[i].split("\\n"); //Separamos tokens o palabras reservadas
+            for (String sentencia : sentencias) {
+                //Recorremos las sentencias
+                Palabras = sentencia.split("\\n"); //Separamos tokens o palabras reservadas
                 String[] aux = Palabras[0].split(" JMP ");
-                
                 Preanalisis = aux[0];
                 TipoToken = aux[1];
-                
                 switch(Preanalisis){
                     case "SELECT"://Cuando nos encontremos con un token de SELECT al inicio de una sentencia
                         Coincidir("SELECT");
-                        S1();                       //ALL|DISTINCT
-                        S2();                       //TOP
-                        S3();                       //The columns to be selected for the result set
-                        
+                        S1();                               //ALL|DISTINCT
+                        S2();                               //TOP
+                        S3();                               //The columns to be selected for the result set
                         if (Contador < Palabras.length) {   //Puede que se de el caso de que el select solo tenga expresiones
                             Coincidir("FROM");
                             F1();                           //Consumir Identificador
+                            
+                            if (Contador < Palabras.length) {
+                                switch(Preanalisis){
+                                    case "INNER":
+                                        CoincidirTipo("RESERVADAS");            //INNER
+                                        J3();                                   //RESTO DEL JOIN
+                                        break;
+                                    case "LEFT":case "RIGHT":case "FULL":
+                                        CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+                                        J1();                                   //OUTER
+                                        J3();                                   //Resto del JOIN
+                                        break;
+                                    case "JOIN":
+                                        J3();
+                                        break;
+                                    case "WHERE":                               
+                                        Coincidir("WHERE");                     //WHERE
+                                        CoincidirTipo("IDENTIFICADOR");         //Columna o databse name
+                                        J2();                                   //Columna o alias
+                                        
+                                    break;
+                                    default:
+                                        Reportar(Preanalisis);
+                                        break;
+                                }
+                            }
                         }   
                         break;
                     default://Error de palabra de incio - pasaremos a la siguiente palabra?
-                     break;  
+                        break;  
                 }
             }
             
@@ -203,9 +221,6 @@ public class minisql extends javax.swing.JFrame {
         }   
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 
-    private void Reportar(String text){
-        
-    }
     private void AS1(){
         if ("AS".equals(Preanalisis)) {
             Coincidir("AS");
@@ -223,7 +238,7 @@ public class minisql extends javax.swing.JFrame {
                 if (".".equals(Preanalisis)) {
                     Coincidir(".");
                     CoincidirTipo("IDENTIFICADOR");         //Esto sería el schema o la columna
-                    F2();
+                    F2();                                   //En caso que tenga algun otro schema o tenga alias
                 }
                 break;
             default://NO HACER NADA! Ya que no es necesario que se consuma 
@@ -236,12 +251,22 @@ public class minisql extends javax.swing.JFrame {
             CoincidirTipo("IDENTIFICADOR");                 //Este sería el ALIAS de la tabla
         }
         
-        if (".".equals(Preanalisis)) {
+        else if (".".equals(Preanalisis)) {
             Coincidir(".");
             CoincidirTipo("IDENTIFICADOR");                 //Esta seria la columna de la tabla
             
-            if ("IDENTIFICADOR".equals(TipoToken)) {
-                CoincidirTipo("IDENTIFICADOR");             //Este sería el ALIAS de la tabla
+            switch(TipoToken){                              //ALIAS
+                case "IDENTIFICADOR":
+                    CoincidirTipo("IDENTIFICADOR");         
+                    break;
+                case "RESERVADAS":
+                    if ("AS".equals(Preanalisis)) {
+                        Coincidir("AS");
+                        CoincidirTipo("IDENTIFICADOR");
+                    }
+                    break;
+                default:                                    //Esta seccion podría o no venir
+                    break;
             }
         }
     }
@@ -272,6 +297,54 @@ public class minisql extends javax.swing.JFrame {
                     Reportar(Preanalisis);
                     break;
             }
+        }
+    }
+    
+    private void J1(){
+        if ("OUTER".equals(Preanalisis)) {
+            Coincidir("OUTER");
+        }
+    }
+    
+    /**
+     * Metodo para analizar si se obtiene alias o columna
+     */
+    private void J2(){
+        if (".".equals(Preanalisis)) {
+            Coincidir(".");
+            CoincidirTipo("IDENTIFICADOR");
+            
+            if ("IDENTIFICADOR".equals(TipoToken)) 
+                CoincidirTipo("IDENTIFICADOR");
+        }
+    }
+    
+    private void J3(){
+        Coincidir("JOIN");                      //JOIN
+        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
+        J2();                                   //Resto de la tabla
+        Coincidir("ON");                        //ON
+        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
+        J2();                                   //Resto de la tabla
+        Coincidir("=");                         // =
+        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
+        J2();                                   //Resto de la tabla
+        
+        switch(Preanalisis){
+            case "INNER":
+                CoincidirTipo("RESERVADAS");            //INNER
+                J3();                                   //RESTO DEL JOIN
+                break;
+            case "LEFT":case "RIGHT":case "FULL":
+                CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+                J1();                                   //OUTER
+                J3();                                   //Resto del JOIN
+                break;
+            case "JOIN":
+                J3();
+                break;
+            default:
+                break;
         }
     }
     
@@ -396,6 +469,10 @@ public class minisql extends javax.swing.JFrame {
             Coincidir(",");
             S3();
         }
+    }
+    
+     private void Reportar(String text){ //PENDIENTE
+        
     }
     
     /**
