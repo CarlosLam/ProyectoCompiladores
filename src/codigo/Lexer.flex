@@ -523,11 +523,10 @@ espacio=[ \t\r\n]
 
 {D}+{P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Float;}
 
-"+" {lexeme=yytext(); lin=yyline; col=yycolumn; return Suma;}
-"-" {lexeme=yytext(); lin=yyline; col=yycolumn; return Resta;}
-"*" {lexeme=yytext(); lin=yyline; col=yycolumn; return Multiplicacion;}
-"/" {lexeme=yytext(); lin=yyline; col=yycolumn; return Division;}
-
+"+" |
+"-" |
+"*" |
+"/" |
 "<" |
 "<=" |
 ">" |

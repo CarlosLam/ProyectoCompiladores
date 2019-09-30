@@ -14,9 +14,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Locale;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
@@ -46,8 +48,8 @@ public class minisql extends javax.swing.JFrame {
 
         btnLoadFlex = new javax.swing.JButton();
         btnCargarSQL = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblFinal = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtRespuesta = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,18 +67,9 @@ public class minisql extends javax.swing.JFrame {
             }
         });
 
-        tblFinal.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane2.setViewportView(tblFinal);
+        txtRespuesta.setColumns(20);
+        txtRespuesta.setRows(5);
+        jScrollPane1.setViewportView(txtRespuesta);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -86,13 +79,13 @@ public class minisql extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnLoadFlex)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCargarSQL)
-                        .addGap(24, 24, 24))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 878, Short.MAX_VALUE)
-                        .addContainerGap())))
+                        .addComponent(btnLoadFlex)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 666, Short.MAX_VALUE)
+                        .addComponent(btnCargarSQL)
+                        .addGap(24, 24, 24))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,9 +94,9 @@ public class minisql extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLoadFlex)
                     .addComponent(btnCargarSQL))
-                .addGap(48, 48, 48)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(94, Short.MAX_VALUE))
         );
 
         pack();
@@ -121,14 +114,14 @@ public class minisql extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnLoadFlexActionPerformed
 
+    
+    private String Preanalisis = "";
+    private String TipoToken = "";
+    private String[] Palabras;
+    private int Contador = 0;
+    
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
-        
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Lineas y Columnas");
-        model.addColumn("Palabra");
-        model.addColumn("Token");
-        tblFinal.setModel(model);
         
         File archivo;
         JFileChooser dialogo = new JFileChooser();
@@ -154,22 +147,13 @@ public class minisql extends javax.swing.JFrame {
                     
                     switch (tokens) {
                         case ERROR:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" +"ERROR\t"+ lexer.lexeme + " caracter no valido" +"\n";
-                            break;
-                        case ErrorMultilinea:
-                            result += "Linea " + lexer.lin + "\tERROR\tNo se encuentra apertura/cerradura de comentario multilinea\n";
+                            result += "ERROR JMP ERROR\n";
                             break;
                         case IdentificadorOver:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme.substring(0, 31) + ".\t"+ "ERROR. MAX LONGITUD. Nuevo token: " + "\n";
-                            break;
-                        case ErrorCadena:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + "ERROR \t" + "La siguiente cadena contiene un caracter no valido" + lexer.lexeme + "\n";
-                            break;
-                        case ErrorApertura:
-                            result += "Linea " + lexer.lin + ".\t" + "ERROR\t" + "Falta terminar la cadena en esta línea" + lexer.lexeme + "\n";
+                            result += lexer.lexeme.substring(0, 31) + " JMP IDENTIFICADOR\n";
                             break;
                         default:
-                            result += "Linea " + lexer.lin + " Columnas:"+lexer.col +"-"+(lexer.col+lexer.lexeme.length()) + ".\t" + lexer.lexeme + "\t" + "Es " + tokens.toString().toUpperCase() + "\n";
+                            result += lexer.lexeme + " JMP " + tokens.toString().toUpperCase() + "\n";
                             break;
                     }
                 }
@@ -179,18 +163,241 @@ public class minisql extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
+            txtRespuesta.setText(result);
             
-            //Añadir la data al table
-            String[] lineas = result.split("\\n");
-            String[] data;
-
-            for (int i = 0; i < lineas.length; i++) {
-                data = lineas[i].split("\\t");
-                model.addRow(data);
+            boolean error = false;
+            String[] sentencias = result.split("; JMP CARACTERES\\n");                  //Separacion de las 8 sentencias posibles mediante ';'
+            
+            for (int i = 0; i<sentencias.length;i++) {//Recorremos las sentencias
+                Palabras = sentencias[i].split("\\n"); //Separamos tokens o palabras reservadas
+                String[] aux = Palabras[0].split(" JMP ");
+                
+                Preanalisis = aux[0];
+                TipoToken = aux[1];
+                
+                switch(Preanalisis){
+                    case "SELECT"://Cuando nos encontremos con un token de SELECT al inicio de una sentencia
+                        Coincidir("SELECT");
+                        S1();                       //ALL|DISTINCT
+                        S2();                       //TOP
+                        S3();                       //The columns to be selected for the result set
+                        
+                        if (Contador < Palabras.length) {   //Puede que se de el caso de que el select solo tenga expresiones
+                            Coincidir("FROM");
+                            F1();                           //Consumir Identificador
+                        }   
+                        break;
+                    default://Error de palabra de incio - pasaremos a la siguiente palabra?
+                     break;  
+                }
             }
+            
+            if (!error) {
+                //txtRespuesta.setText("");
+                JOptionPane.showMessageDialog(null, "No se ha encontrado ningun error");
+            }
+            else{
+                //Sino llenamos de informacion el txtRespuesta
+                
+            }    
         }   
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 
+    private void Reportar(String text){
+        
+    }
+    private void AS1(){
+        if ("AS".equals(Preanalisis)) {
+            Coincidir("AS");
+            CoincidirAS();
+        }
+    }
+    
+    private void F1(){
+        CoincidirTipo("IDENTIFICADOR");
+        switch(TipoToken){
+            case "IDENTIFICADOR":
+                CoincidirTipo("IDENTIFICADOR");
+                break;
+            case "CARACTERES":
+                if (".".equals(Preanalisis)) {
+                    Coincidir(".");
+                    CoincidirTipo("IDENTIFICADOR");         //Esto sería el schema o la columna
+                    F2();
+                }
+                break;
+            default://NO HACER NADA! Ya que no es necesario que se consuma 
+                break;
+        }
+    }
+    
+    private void F2(){
+        if ("IDENTIFICADOR".equals(TipoToken)) {
+            CoincidirTipo("IDENTIFICADOR");                 //Este sería el ALIAS de la tabla
+        }
+        
+        if (".".equals(Preanalisis)) {
+            Coincidir(".");
+            CoincidirTipo("IDENTIFICADOR");                 //Esta seria la columna de la tabla
+            
+            if ("IDENTIFICADOR".equals(TipoToken)) {
+                CoincidirTipo("IDENTIFICADOR");             //Este sería el ALIAS de la tabla
+            }
+        }
+    }
+    
+    
+    private void ID1(){                                         //Cuando suponemos que algo acompaña al table
+        if (".".equals(Preanalisis)) {
+            
+            Coincidir(".");
+            
+            switch(TipoToken){                                  //Puede venir ID, *, $IDENTITY
+                case "IDENTIFICADOR":
+                    CoincidirTipo("IDENTIFICADOR");
+                    break;
+                    case "CARACTERES":
+                        if ("*".equals(Preanalisis)) {
+                            Coincidir("*");
+                        }
+                        else if ("$".equals(Preanalisis)) {
+                            Coincidir("$");
+                            Coincidir("IDENTITY");
+                        }
+                        else{
+                            Reportar(Preanalisis);
+                        }
+                    break;
+                default:
+                    Reportar(Preanalisis);
+                    break;
+            }
+        }
+    }
+    
+    private void S1(){
+        if ("ALL".equals(Preanalisis)) 
+            Coincidir("ALL");
+        
+        if ("DISTINCT".equals(Preanalisis)) 
+            Coincidir("DISTINCT");
+    }
+    
+    private void S2(){
+        if ("TOP".equals(Preanalisis)) {
+            Coincidir("TOP");
+            CoincidirNum();
+            if ("PERCENT".equals(Preanalisis)) {
+                Coincidir("PERCENT");
+            }
+        }
+        else if ("PERCENT".equals(Preanalisis) || "ALL".equals(Preanalisis) || "DISTINCT".equals(Preanalisis)) {
+            Reportar(Preanalisis);
+        }
+    }
+    
+    private void S3(){                                          //Tipo de expresion que viene en select
+        switch(TipoToken){                                      
+            case "CARACTERES":                                  
+                switch(Preanalisis){
+                    case "*":                                   //Cuando se trata unicamente de un *
+                        Coincidir("*");
+                        CoincidirComa();                        //Ver si le sigue una coma
+                        break;
+                    default:
+                        Reportar(Preanalisis);
+                        break;
+                }
+                break;
+            case "RESERVADAS":
+                switch(Preanalisis){
+                    case "COUNT":
+                        Coincidir("COUNT");
+                        Coincidir("(");
+                                                                //COMING SOON JEJEJE
+                        break;
+                    default:
+                        Reportar(Preanalisis);
+                        break;
+                }
+                break;
+            case "IDENTIFICADOR":
+                CoincidirTipo("IDENTIFICADOR");
+                ID1();                                          //Puede que el identificador de arriba no sea una columna, sino una tabla, una view o alias
+                AS1();                                          //Puede venir o no un AS ...
+                CoincidirComa();                                //Puede venir una coma ,
+                break;
+            default:
+                Reportar(Preanalisis);
+                break;
+        }
+    }
+    
+    private void Coincidir(String token){
+        if (!Preanalisis.equals(token)) {
+            Reportar(Preanalisis);   
+        }
+        else{
+            Contador++;
+            
+            if (Contador < Palabras.length){
+                String[] aux = Palabras[Contador].split(" JMP ");
+                Preanalisis = aux[0];
+                TipoToken = aux[1];   
+            }
+        }
+    }
+    
+    private void CoincidirAS(){
+        if("CADENA".equals(TipoToken))
+            CoincidirTipo("CADENA");
+        
+        else if("IDENTIFICADOR".equals(TipoToken))
+            CoincidirTipo("IDENTIFICADOR");
+        
+        else
+            Reportar(Preanalisis);
+    }
+    
+    private void CoincidirTipo(String token){
+        if (!TipoToken.equals(token)) {
+            Reportar(Preanalisis);   
+        }
+        else{
+            Contador++;
+            
+            if (Contador < Palabras.length){
+                String[] aux = Palabras[Contador].split(" JMP ");
+                Preanalisis = aux[0];
+                TipoToken = aux[1];   
+            }
+        }
+    }
+    
+    private void CoincidirNum(){
+        switch(TipoToken){
+            case "ENTERO":
+                CoincidirTipo("ENTERO");
+                break;
+            case "DECIMAL":
+                CoincidirTipo("DECIMAL");
+                break;
+            case "FLOAT":
+                CoincidirTipo("FLOAT");
+                break;
+            default:
+                Reportar(Preanalisis);
+                break;
+        }
+    }
+    
+    private void CoincidirComa(){
+        if (",".equals(Preanalisis)) {
+            Coincidir(",");
+            S3();
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -229,7 +436,7 @@ public class minisql extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCargarSQL;
     private javax.swing.JButton btnLoadFlex;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable tblFinal;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea txtRespuesta;
     // End of variables declaration//GEN-END:variables
 }
