@@ -176,27 +176,29 @@ public class minisql extends javax.swing.JFrame {
                         S3();                               //The columns to be selected for the result set
                         if (Contador < Palabras.length) {   //Puede que se de el caso de que el select solo tenga expresiones
                             Coincidir("FROM");
-                            F1();                           //Consumir Identificador
+                            F1();                           //METODO FROM
                             
                             if (Contador < Palabras.length) {
                                 switch(Preanalisis){
                                     case "INNER":
                                         CoincidirTipo("RESERVADAS");            //INNER
-                                        J3();                                   //RESTO DEL JOIN
+                                        J1();                                   //RESTO DEL JOIN
                                         break;
                                     case "LEFT":case "RIGHT":case "FULL":
                                         CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-                                        J1();                                   //OUTER
-                                        J3();                                   //Resto del JOIN
+                                        
+                                        if ("OUTER".equals(Preanalisis)){       //OUTER
+                                           Coincidir("OUTER");                              
+                                        }
+                                        
+                                        J1();                                   //Resto del JOIN
                                         break;
                                     case "JOIN":
-                                        J3();
+                                        J1();
                                         break;
                                     case "WHERE":                               
                                         Coincidir("WHERE");                     //WHERE
-                                        CoincidirTipo("IDENTIFICADOR");         //Columna o databse name
-                                        J2();                                   //Columna o alias
-                                        
+                                        W();                                    //METODO
                                     break;
                                     default:
                                         Reportar(Preanalisis);
@@ -228,24 +230,32 @@ public class minisql extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * MEOTODO FROM 
+     * validamos unicamente ID ID| ID.ID
+     */
     private void F1(){
-        CoincidirTipo("IDENTIFICADOR");
+        CoincidirTipo("IDENTIFICADOR");                     //Consumimos el primer token
         switch(TipoToken){
             case "IDENTIFICADOR":
-                CoincidirTipo("IDENTIFICADOR");
+                CoincidirTipo("IDENTIFICADOR");             //ALIAS
                 break;
             case "CARACTERES":
                 if (".".equals(Preanalisis)) {
                     Coincidir(".");
-                    CoincidirTipo("IDENTIFICADOR");         //Esto sería el schema o la columna
+                    CoincidirTipo("IDENTIFICADOR");         //Lo anterior era database o table
                     F2();                                   //En caso que tenga algun otro schema o tenga alias
                 }
                 break;
-            default://NO HACER NADA! Ya que no es necesario que se consuma 
+            default:                                        //NO HACER NADA! Ya que no es necesario que se consuma 
                 break;
         }
     }
     
+    /**
+     * ID.ID ->.ID
+     * ID.ID ->ID
+     */
     private void F2(){
         if ("IDENTIFICADOR".equals(TipoToken)) {
             CoincidirTipo("IDENTIFICADOR");                 //Este sería el ALIAS de la tabla
@@ -271,7 +281,9 @@ public class minisql extends javax.swing.JFrame {
         }
     }
     
-    
+    /**
+     * .ID | .*
+     */
     private void ID1(){                                         //Cuando suponemos que algo acompaña al table
         if (".".equals(Preanalisis)) {
             
@@ -282,16 +294,10 @@ public class minisql extends javax.swing.JFrame {
                     CoincidirTipo("IDENTIFICADOR");
                     break;
                     case "CARACTERES":
-                        if ("*".equals(Preanalisis)) {
+                        if ("*".equals(Preanalisis)) 
                             Coincidir("*");
-                        }
-                        else if ("$".equals(Preanalisis)) {
-                            Coincidir("$");
-                            Coincidir("IDENTITY");
-                        }
-                        else{
+                        else
                             Reportar(Preanalisis);
-                        }
                     break;
                 default:
                     Reportar(Preanalisis);
@@ -300,9 +306,49 @@ public class minisql extends javax.swing.JFrame {
         }
     }
     
+    /***
+     * SI existe punto e identificador
+     */
+    private void ID2(){
+        if (".".equals(Preanalisis)) {
+            Coincidir(".");
+            CoincidirTipo("IDENTIFICADOR");
+        }
+    }
+    
+    /**
+     * Metodo para consumir desde JOIN hasta la ultima columna relacionada
+     */
     private void J1(){
-        if ("OUTER".equals(Preanalisis)) {
-            Coincidir("OUTER");
+        Coincidir("JOIN");                      //JOIN
+        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
+        J2();                                   //Resto de la tabla
+        Coincidir("ON");                        //ON
+        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
+        J2();                                   //Resto de la tabla
+        Coincidir("=");                         // =
+        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
+        J2();                                   //Resto de la tabla
+        
+        switch(Preanalisis){
+            case "INNER":
+                CoincidirTipo("RESERVADAS");            //INNER
+                J1();                                   //RESTO DEL JOIN
+                break;
+            case "LEFT":case "RIGHT":case "FULL":
+                CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+                
+                if ("OUTER".equals(Preanalisis)){         //OUTER
+                    Coincidir("OUTER");                              
+                }
+                
+                J1();                                   //Resto del JOIN
+                break;
+            case "JOIN":
+                J1();
+                break;
+            default:
+                break;
         }
     }
     
@@ -318,36 +364,10 @@ public class minisql extends javax.swing.JFrame {
                 CoincidirTipo("IDENTIFICADOR");
         }
     }
-    
-    private void J3(){
-        Coincidir("JOIN");                      //JOIN
-        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
-        J2();                                   //Resto de la tabla
-        Coincidir("ON");                        //ON
-        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
-        J2();                                   //Resto de la tabla
-        Coincidir("=");                         // =
-        CoincidirTipo("IDENTIFICADOR");         //Tabla o database name
-        J2();                                   //Resto de la tabla
-        
-        switch(Preanalisis){
-            case "INNER":
-                CoincidirTipo("RESERVADAS");            //INNER
-                J3();                                   //RESTO DEL JOIN
-                break;
-            case "LEFT":case "RIGHT":case "FULL":
-                CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-                J1();                                   //OUTER
-                J3();                                   //Resto del JOIN
-                break;
-            case "JOIN":
-                J3();
-                break;
-            default:
-                break;
-        }
-    }
-    
+
+    /**
+     * ALL || DISTINCT
+     */
     private void S1(){
         if ("ALL".equals(Preanalisis)) 
             Coincidir("ALL");
@@ -406,6 +426,172 @@ public class minisql extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * METODO WHERE
+     */
+    private void W(){
+        if ("NOT".equals(Preanalisis))                             //Coincidir NOT
+            Coincidir("NOT");
+        
+        
+        switch(TipoToken){
+            case "RESERVADAS":
+                switch(Preanalisis){
+                    case "CONTAINS":case"FREETEXT":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        CoincidirTipo("IDENTIFICADOR");
+                        ID1();
+                        Coincidir(",");
+                        CoincidirTipo("CADENA");
+                        Coincidir(")");
+                        W2();
+                        break;
+                    case "SUM":case "MAX":case "MIN":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        S1();                                       //ALL|DISTINCT
+                        W1();                                       //Expression
+                        Coincidir(")");
+                        break;
+                    case "COUNT":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        
+                        if ("*".equals(Preanalisis)) {
+                            Coincidir("*");
+                            Coincidir(")");
+                        } else{
+                            S1();
+                            W1();
+                            Coincidir(")");
+                        }
+                        break;
+                    default:
+                        Reportar(Preanalisis);
+                        break;
+                }
+                break;
+            case "IDENTIFICADOR":case "CADENA": case "ENTERO":case "DECIMAL":case "FLOAT":case "CARACTERES":
+                W1();
+                break;
+            default:
+                break;
+        }
+    }
+    /**
+     * EXPRESSION 
+     */
+    private void W1(){
+        switch(TipoToken){
+            case "IDENTIFICADOR":
+                CoincidirTipo("IDENTIFICADOR");                 //Posible columna
+                ID2();                                          //En caso de que lo anterior sea Tabla
+                W4();
+                break;
+            case "CADENA":
+                CoincidirTipo("CADENA");
+                W4();
+                break;
+            case "ENTERO":
+                CoincidirTipo("ENTERO");
+                W4();
+                break;
+            case "DECIMAL":
+                CoincidirTipo("DECIMAL");
+                W4();
+                break;
+            case "FLOAT":
+                CoincidirTipo("FLOAT");
+                W4();
+                break;
+            case "CARACTERES":
+                switch(Preanalisis){
+                    case "(":
+                        Coincidir("(");
+                        W1();
+                        Coincidir(")");
+                        break;
+                    default:
+                        Reportar(Preanalisis);
+                        break;
+                }
+                break;
+            case "RESERVADAS":
+                switch(Preanalisis){
+                    case "SUM":case "MAX":case "MIN":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        S1();                                           //ALL | DISTINCT
+                        W1();
+                        Coincidir(")");
+                        break;
+                    case "COUNT":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        
+                        if ("*".equals(Preanalisis)) {
+                            Coincidir("*");
+                            Coincidir(")");
+                        } else{
+                            S1();
+                            W1();
+                            Coincidir(")");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                Reportar(Preanalisis);
+                break;
+        }
+    }
+    
+    /**
+     * AND | OR NOT
+     */
+    private void W2(){
+        if ("AND".equals(Preanalisis) || "OR".equals(Preanalisis)) {
+            CoincidirTipo("RESERVADAS");
+            W();
+        }
+    }
+    /**
+     * ID | ID.ID | *
+     */
+    private void W3(){
+        switch(TipoToken){
+            case "CARACTERES":
+                if("*".equals(Preanalisis))
+                    Coincidir("*");
+                else
+                    Reportar(Preanalisis);
+                break;
+            case "IDENTIFICADOR":
+                CoincidirTipo("IDENTIFICADOR");                 //Posible columna
+                ID2();                                          //En caso de que lo anterior sea Tabla
+                break;
+            default:
+                Reportar(Preanalisis);
+                break;
+        }
+    }
+    
+    /**
+     * SIGNOS
+     */
+    private void W4(){
+        switch(Preanalisis){
+            case "+":case "-":case "*":case "/":case "%":
+                CoincidirTipo("CARACTERES");
+                W1();
+                break;
+            default:
+                break;
+        }
+    }
     private void Coincidir(String token){
         if (!Preanalisis.equals(token)) {
             Reportar(Preanalisis);   
