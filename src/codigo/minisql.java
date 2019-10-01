@@ -169,6 +169,10 @@ public class minisql extends javax.swing.JFrame {
                 String[] aux = Palabras[0].split(" JMP ");
                 Preanalisis = aux[0];
                 TipoToken = aux[1];
+                
+                if ("GO".equals(Preanalisis)) {
+                    Coincidir("GO");
+                }
                 switch(Preanalisis){
                     case "SELECT"://Cuando nos encontremos con un token de SELECT al inicio de una sentencia
                         Coincidir("SELECT");
@@ -249,6 +253,44 @@ public class minisql extends javax.swing.JFrame {
                         Coincidir("(");
                         W1();
                         Coincidir(")");
+                        break;
+                    case "UPDATE":
+                        Coincidir("UPDATE");
+                        S2();                                               //TOP PERCENT
+                        INSERT1();                                          //Tabla donde se insertaran los datos
+                        Coincidir("SET");
+                        UPDATE1();
+                        Output();
+                        if ("FROM".equals(Preanalisis)) {
+                            Coincidir("FROM");
+                            F1();                           //METODO FROM
+                            
+                            if (Contador < Palabras.length) {
+                                switch(Preanalisis){
+                                    case "INNER":
+                                        CoincidirTipo("RESERVADAS");            //INNER
+                                        J1();                                   //RESTO DEL JOIN
+                                        break;
+                                    case "LEFT":case "RIGHT":case "FULL":
+                                        CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+                                        
+                                        if ("OUTER".equals(Preanalisis)){       //OUTER
+                                           Coincidir("OUTER");                              
+                                        }
+                                        J1();                                   //Resto del JOIN
+                                        break;
+                                    case "JOIN":
+                                        J1();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                        if ("WHERE".equals(Preanalisis)) {
+                            Coincidir("WHERE");                     //WHERE
+                            W();                                    //METODO
+                        }
                         break;
                     default://Error de palabra de incio - pasaremos a la siguiente palabra?
                         break;  
@@ -573,6 +615,22 @@ public class minisql extends javax.swing.JFrame {
                 Reportar(Preanalisis);
                 break;
         }
+    }
+    
+    private void UPDATE1(){
+        CoincidirTipo("IDENTIFICADOR");
+        Coincidir("=");
+        if ("DEFAULT".equals(Preanalisis) || "NULL".equals(Preanalisis)) {
+            CoincidirTipo("RESERVADAS");
+        }else{
+            W1();                                                   //EXPRESIONES
+        }
+        
+        if (",".equals(Preanalisis)) {
+            Coincidir(",");
+            UPDATE1();
+        }
+        
     }
     
     /**
