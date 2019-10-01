@@ -227,10 +227,14 @@ public class minisql extends javax.swing.JFrame {
                                 O();                                    //METODO
                             }
                         }
+                        
+                        if ((Contador < Palabras.length)) 
+                            Reportar(Preanalisis);                      //No debe haber sentencias luego de las enlistadas anteriormente
+                        
                         break;
                     case "INSERT":
                         Coincidir("INSERT");
-                        S2();
+                        S2();                                               //TOP PERCENT
                         Coincidir("INTO");
                         INSERT1();                                          //Tabla donde se insertaran los datos
                         if ("(".equals(Preanalisis)) {                      //Cuando la persona primer elige el orden de las columnas
@@ -241,10 +245,10 @@ public class minisql extends javax.swing.JFrame {
                         if ("OUTPUT".equals(Preanalisis)) {
                              Output();
                         }
-                        
                         Coincidir("VALUES");
-                        
-                        
+                        Coincidir("(");
+                        W1();
+                        Coincidir(")");
                         break;
                     default://Error de palabra de incio - pasaremos a la siguiente palabra?
                         break;  
@@ -458,10 +462,52 @@ public class minisql extends javax.swing.JFrame {
     private void O(){
         G();
     }
-    
+    /**
+     * METODO DE OUTPUT
+     */
     private void Output(){
         Coincidir("OUTPUT");
+        Output1();
         
+        if ("INTO".equals(Preanalisis)) {
+            Coincidir("INTO");
+            
+            if("@".equals(Preanalisis)){
+                Coincidir("@");
+            }
+            CoincidirTipo("IDENTIFICADOR");
+            
+            if ("(".equals(Preanalisis)) {
+                Coincidir("(");
+                INSERT2();                      //Listado de columnas
+                Coincidir(")");
+            }
+            
+        }
+    }
+    /**
+     * DELETED | INSERTED | ID '.' * | ID [AS ID | Cadena] ,
+     */
+    private void Output1(){
+        if ("DELETED".equals(Preanalisis) || "INSERTED".equals(Preanalisis) || "IDENTIFICADOR".equals(TipoToken)) {
+            CoincidirTipo("IDENTIFICADOR");
+            Coincidir(".");
+            
+            if ("*".equals(Preanalisis)) {
+                Coincidir("*");
+            } else if ("IDENTIFICADOR".equals(TipoToken)) {
+                CoincidirTipo("IDENTIFICADOR");
+            } else{
+                Reportar(Preanalisis);
+            }
+            
+            if (",".equals(Preanalisis)) {
+                Coincidir(",");
+                Output1();
+            }
+        } else{
+            Reportar(Preanalisis);
+        }
     }
     
 
@@ -637,8 +683,8 @@ public class minisql extends javax.swing.JFrame {
                             Coincidir("*");
                             Coincidir(")");
                         } else{
-                            S1();
-                            W1();
+                            S1();                                    //ALL | DISTINCT
+                            W1();                                    //EXPRESIONES
                             Coincidir(")");
                         }
                         break;
