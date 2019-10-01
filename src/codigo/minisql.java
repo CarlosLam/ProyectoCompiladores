@@ -115,6 +115,7 @@ public class minisql extends javax.swing.JFrame {
     private String[] Palabras;
     private int Contador = 0;
     private int errores = 0;
+    private String TokenError = "";
     
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
@@ -159,7 +160,6 @@ public class minisql extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
-            txtRespuesta.setText(result);
 
             String[] sentencias = result.split("; JMP CARACTERES\\n");                  //Separacion de las 8 sentencias posibles mediante ';'
             for (String sentencia : sentencias) {
@@ -173,186 +173,282 @@ public class minisql extends javax.swing.JFrame {
                 if ("GO".equals(Preanalisis)) {
                     Coincidir("GO");
                 }
-                switch(Preanalisis){
-                    case "SELECT"://Cuando nos encontremos con un token de SELECT al inicio de una sentencia
-                        Coincidir("SELECT");
-                        S1();                               //ALL|DISTINCT
-                        S2();                               //TOP
-                        S3();                               //The columns to be selected for the result set
-                        if (Contador < Palabras.length) {   //Puede que se de el caso de que el select solo tenga expresiones
-                            Coincidir("FROM");
-                            F1();                           //METODO FROM
-                            
-                            if (Contador < Palabras.length) {
-                                switch(Preanalisis){
-                                    case "INNER":
-                                        CoincidirTipo("RESERVADAS");            //INNER
-                                        J1();                                   //RESTO DEL JOIN
-                                        break;
-                                    case "LEFT":case "RIGHT":case "FULL":
-                                        CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-                                        
-                                        if ("OUTER".equals(Preanalisis)){       //OUTER
-                                           Coincidir("OUTER");                              
-                                        }
-                                        J1();                                   //Resto del JOIN
-                                        break;
-                                    case "JOIN":
-                                        J1();
-                                        break;
-                                    default:
-                                        break;
+                try{                
+                    switch(Preanalisis){
+                        case "SELECT"://Cuando nos encontremos con un token de SELECT al inicio de una sentencia
+                            Coincidir("SELECT");
+                            S1();                               //ALL|DISTINCT
+                            S2();                               //TOP
+                            S3();                               //The columns to be selected for the result set
+                            if (Contador < Palabras.length) {   //Puede que se de el caso de que el select solo tenga expresiones
+                                Coincidir("FROM");
+                                F1();                           //METODO FROM
+
+                                if (Contador < Palabras.length) {
+                                    switch(Preanalisis){
+                                        case "INNER":
+                                            CoincidirTipo("RESERVADAS");            //INNER
+                                            J1();                                   //RESTO DEL JOIN
+                                            break;
+                                        case "LEFT":case "RIGHT":case "FULL":
+                                            CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+
+                                            if ("OUTER".equals(Preanalisis)){       //OUTER
+                                               Coincidir("OUTER");                              
+                                            }
+                                            J1();                                   //Resto del JOIN
+                                            break;
+                                        case "JOIN":
+                                            J1();
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                        if (Contador < Palabras.length) {
-                            if("WHERE".equals(Preanalisis)){
+                            if (Contador < Palabras.length) {
+                                if("WHERE".equals(Preanalisis)){
+                                    Coincidir("WHERE");                     //WHERE
+                                    W();                                    //METODO
+                                }
+                            }
+                            if (Contador < Palabras.length) {
+                                if("GROUP".equals(Preanalisis)){
+                                    Coincidir("GROUP");                     //Group
+                                    Coincidir("BY");                        //Group
+                                    G();                                    //METODO
+                                }
+                            }
+                            if (Contador < Palabras.length) {
+                                if("HAVING".equals(Preanalisis)){
+                                    Coincidir("HAVING");                     //HAVING
+                                    H();                                    //METODO
+                                }
+                            }
+                            if (Contador < Palabras.length) {
+                                if("ORDER".equals(Preanalisis)){
+                                    Coincidir("ORDER");                     //ORDER
+                                    Coincidir("BY");                        //BY
+                                    O();                                    //METODO
+                                }
+                            }
+
+                            if ((Contador < Palabras.length)) 
+                                Reportar(Preanalisis);                      //No debe haber sentencias luego de las enlistadas anteriormente
+
+                            break;
+                        case "INSERT":
+                            Coincidir("INSERT");
+                            S2();                                               //TOP PERCENT
+                            Coincidir("INTO");
+                            INSERT1();                                          //Tabla donde se insertaran los datos
+                            if ("(".equals(Preanalisis)) {                      //Cuando la persona primer elige el orden de las columnas
+                                Coincidir("(");
+                                INSERT2();                                      //Todas las posibles columnas
+                                Coincidir(")");
+                            }
+                            if ("OUTPUT".equals(Preanalisis)) {
+                                 Output();
+                            }
+                            Coincidir("VALUES");
+                            Coincidir("(");
+                            Expresiones();                                               //HOUSTON PROBLEMAS
+                            while(",".equals(Preanalisis)){
+                                Coincidir(",");
+                                Expresiones();
+                            }
+                            Coincidir(")");
+                            break;
+                        case "UPDATE":
+                            Coincidir("UPDATE");
+                            S2();                                               //TOP PERCENT
+                            INSERT1();                                          //Tabla donde se insertaran los datos
+                            Coincidir("SET");
+                            UPDATE1();
+                            Output();
+                            if ("FROM".equals(Preanalisis)) {
+                                Coincidir("FROM");
+                                F1();                           //METODO FROM
+
+                                if (Contador < Palabras.length) {
+                                    switch(Preanalisis){
+                                        case "INNER":
+                                            CoincidirTipo("RESERVADAS");            //INNER
+                                            J1();                                   //RESTO DEL JOIN
+                                            break;
+                                        case "LEFT":case "RIGHT":case "FULL":
+                                            CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+
+                                            if ("OUTER".equals(Preanalisis)){       //OUTER
+                                               Coincidir("OUTER");                              
+                                            }
+                                            J1();                                   //Resto del JOIN
+                                            break;
+                                        case "JOIN":
+                                            J1();
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                            if ("WHERE".equals(Preanalisis)) {
                                 Coincidir("WHERE");                     //WHERE
                                 W();                                    //METODO
                             }
-                        }
-                        if (Contador < Palabras.length) {
-                            if("GROUP".equals(Preanalisis)){
-                                Coincidir("GROUP");                     //Group
-                                Coincidir("BY");                        //Group
-                                G();                                    //METODO
+                            break;
+                        case "DELETE":
+                            Coincidir("DELETE");
+                            S2();      
+
+                            if ("OUTPUT".equals(Preanalisis)) {
+                                Output();
                             }
-                        }
-                        if (Contador < Palabras.length) {
-                            if("HAVING".equals(Preanalisis)){
-                                Coincidir("HAVING");                     //HAVING
-                                H();                                    //METODO
-                            }
-                        }
-                        if (Contador < Palabras.length) {
-                            if("ORDER".equals(Preanalisis)){
-                                Coincidir("ORDER");                     //ORDER
-                                Coincidir("BY");                        //BY
-                                O();                                    //METODO
-                            }
-                        }
-                        
-                        if ((Contador < Palabras.length)) 
-                            Reportar(Preanalisis);                      //No debe haber sentencias luego de las enlistadas anteriormente
-                        
-                        break;
-                    case "INSERT":
-                        Coincidir("INSERT");
-                        S2();                                               //TOP PERCENT
-                        Coincidir("INTO");
-                        INSERT1();                                          //Tabla donde se insertaran los datos
-                        if ("(".equals(Preanalisis)) {                      //Cuando la persona primer elige el orden de las columnas
-                            Coincidir("(");
-                            INSERT2();                                      //Todas las posibles columnas
-                            Coincidir(")");
-                        }
-                        if ("OUTPUT".equals(Preanalisis)) {
-                             Output();
-                        }
-                        Coincidir("VALUES");
-                        Coincidir("(");
-                        W1();
-                        Coincidir(")");
-                        break;
-                    case "UPDATE":
-                        Coincidir("UPDATE");
-                        S2();                                               //TOP PERCENT
-                        INSERT1();                                          //Tabla donde se insertaran los datos
-                        Coincidir("SET");
-                        UPDATE1();
-                        Output();
-                        if ("FROM".equals(Preanalisis)) {
-                            Coincidir("FROM");
-                            F1();                           //METODO FROM
-                            
-                            if (Contador < Palabras.length) {
-                                switch(Preanalisis){
-                                    case "INNER":
-                                        CoincidirTipo("RESERVADAS");            //INNER
-                                        J1();                                   //RESTO DEL JOIN
-                                        break;
-                                    case "LEFT":case "RIGHT":case "FULL":
-                                        CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-                                        
-                                        if ("OUTER".equals(Preanalisis)){       //OUTER
-                                           Coincidir("OUTER");                              
-                                        }
-                                        J1();                                   //Resto del JOIN
-                                        break;
-                                    case "JOIN":
-                                        J1();
-                                        break;
-                                    default:
-                                        break;
+                            if ("FROM".equals(Preanalisis)) {
+                                Coincidir("FROM");
+                                F1();                           //METODO FROM
+
+                                if (Contador < Palabras.length) {
+                                    switch(Preanalisis){
+                                        case "INNER":
+                                            CoincidirTipo("RESERVADAS");            //INNER
+                                            J1();                                   //RESTO DEL JOIN
+                                            break;
+                                        case "LEFT":case "RIGHT":case "FULL":
+                                            CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+
+                                            if ("OUTER".equals(Preanalisis)){       //OUTER
+                                               Coincidir("OUTER");                              
+                                            }
+                                            J1();                                   //Resto del JOIN
+                                            break;
+                                        case "JOIN":
+                                            J1();
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
-                        }
-                        if ("WHERE".equals(Preanalisis)) {
-                            Coincidir("WHERE");                     //WHERE
-                            W();                                    //METODO
-                        }
-                        break;
-                    case "DELETE":
-                        Coincidir("DELETE");
-                        S2();      
-                        
-                        if ("OUTPUT".equals(Preanalisis)) {
-                            Output();
-                        }
-                        if ("FROM".equals(Preanalisis)) {
-                            Coincidir("FROM");
-                            F1();                           //METODO FROM
-                            
-                            if (Contador < Palabras.length) {
-                                switch(Preanalisis){
-                                    case "INNER":
-                                        CoincidirTipo("RESERVADAS");            //INNER
-                                        J1();                                   //RESTO DEL JOIN
-                                        break;
-                                    case "LEFT":case "RIGHT":case "FULL":
-                                        CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-                                        
-                                        if ("OUTER".equals(Preanalisis)){       //OUTER
-                                           Coincidir("OUTER");                              
-                                        }
-                                        J1();                                   //Resto del JOIN
-                                        break;
-                                    case "JOIN":
-                                        J1();
-                                        break;
-                                    default:
-                                        break;
-                                }
+                            if ("WHERE".equals(Preanalisis)) {
+                                Coincidir("WHERE");                     //WHERE
+                                W();                                    //METODO
                             }
-                        }
-                        if ("WHERE".equals(Preanalisis)) {
-                            Coincidir("WHERE");                     //WHERE
-                            W();                                    //METODO
-                        }
-                        break;
-                    case "CREATE":
-                        
-                        break;
-                    default://Error de palabra de incio - pasaremos a la siguiente palabra?
-                        break;  
+                            break;
+                        case "CREATE":
+                            Coincidir("CREATE");                     //CREATE
+                            switch(Preanalisis){
+                                case "TABLE":
+                                    Coincidir("TABLE");
+                                    INSERT1();
+                                    Coincidir("(");
+                                    CreateTable1();
+
+                                    break;
+                                default:break;
+                            }
+                            break;
+                        default://Error de palabra de incio - pasaremos a la siguiente palabra?
+                            break;  
+                    }
+                }catch(NullPointerException E){
+                    
                 }
             }
             
-            if (errores > 0) {
+            if (errores == 0) {
                 //txtRespuesta.setText("");
                 JOptionPane.showMessageDialog(null, "No se ha encontrado ningun error");
             }
             else{
                 //Sino llenamos de informacion el txtRespuesta
-                
+                txtRespuesta.setText(TokenError);
             }    
         }   
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 
+    /**
+     * SI existe AS coincidir y CoincidirAS
+     */
     private void AS1(){
         if ("AS".equals(Preanalisis)) {
             Coincidir("AS");
             CoincidirAS();
+        }
+    }
+    
+    /**
+     * EXPRESSIONES
+     */
+    private void Expresiones(){
+        switch(TipoToken){
+            case "IDENTIFICADOR":
+                CoincidirTipo("IDENTIFICADOR");                 //Posible columna
+                ID2();                                          //En caso de que lo anterior sea Tabla
+                W4();
+                break;
+            case "CADENA":
+                CoincidirTipo("CADENA");
+                W4();
+                break;
+            case "ENTERO":
+                CoincidirTipo("ENTERO");
+                W4();
+                break;
+            case "DECIMAL":
+                CoincidirTipo("DECIMAL");
+                W4();
+                break;
+            case "FLOAT":
+                CoincidirTipo("FLOAT");
+                W4();
+                break;
+            case "CARACTERES":
+                switch(Preanalisis){
+                    case "(":
+                        Coincidir("(");
+                        Expresiones();
+                        Coincidir(")");
+                        break;
+                    default:
+                        Reportar(Preanalisis);
+                        break;
+                }
+                break;
+            case "RESERVADAS":
+                switch(Preanalisis){
+                    case "SUM":case "MAX":case "MIN": case"YEAR":case"MONTH":case"DAY":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        S1();                                           //ALL | DISTINCT
+                        Expresiones();
+                        Coincidir(")");
+                        break;
+                    case "COUNT":
+                        CoincidirTipo("RESERVADAS");
+                        Coincidir("(");
+                        
+                        if ("*".equals(Preanalisis)) {
+                            Coincidir("*");
+                            Coincidir(")");
+                        } else{
+                            S1();                                    //ALL | DISTINCT
+                            Expresiones();                                    //EXPRESIONES
+                            Coincidir(")");
+                        }
+                        break;
+                        case"GETDATE":
+                            CoincidirTipo("RESERVADAS");
+                            Coincidir("(");
+                            Coincidir(")");
+                            break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                Reportar(Preanalisis);
+                break;
         }
     }
     
@@ -422,8 +518,8 @@ public class minisql extends javax.swing.JFrame {
      * METODO GROUP BY
      */
     private void G(){
-        W1();
-        if (Preanalisis == ",") {
+        Expresiones();
+        if (",".equals(Preanalisis)) {
             Coincidir(",");
             G();
         }
@@ -486,7 +582,7 @@ public class minisql extends javax.swing.JFrame {
     
     private void INSERT2(){
         CoincidirTipo("IDENTIFICADOR");
-        if (Preanalisis == ",") {
+        if (",".equals(Preanalisis)) {
             Coincidir(",");
             INSERT2();
         }
@@ -635,16 +731,7 @@ public class minisql extends javax.swing.JFrame {
                 }
                 break;
             case "RESERVADAS":
-                switch(Preanalisis){
-                    case "COUNT":
-                        Coincidir("COUNT");
-                        Coincidir("(");
-                                                                //COMING SOON JEJEJE
-                        break;
-                    default:
-                        Reportar(Preanalisis);
-                        break;
-                }
+                Expresiones();
                 break;
             case "IDENTIFICADOR":
                 CoincidirTipo("IDENTIFICADOR");
@@ -658,13 +745,48 @@ public class minisql extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Metodo para devolver ID, DATATYPE
+     */
+    private void CreateTable1(){
+        CoincidirTipo("IDENTIFICADOR");
+
+        switch(Preanalisis){
+            case"CHAR":case"BINARY":case"BLOP":case"BIT":case"SMALLINT":case"INT":case"INTEGER":case"FLOAT":case"VARCHAR":
+            case"NVARCHAR":case"NCHAR":
+                CoincidirTipo("RESERVADAS");
+                if ("(".equals(Preanalisis)) {
+                    Coincidir("(");
+                    if ("ENTERO".equals(TipoToken)) {
+                        CoincidirTipo("ENTERO");
+
+                    } else if ("MAX".equals(Preanalisis) || "MIN".equals(Preanalisis)) {
+                        CoincidirTipo("RESERVADAS");
+                    } else{
+                        Reportar(Preanalisis);
+                    }
+                    Coincidir(")");
+                }
+
+                //Coincidir
+                break;
+                case"BOOLEAN":case"DATE":case"BLOB":case"YEAR":case"IMAGE":case"REAL":case"TIME":case"TIMESTAMP":
+                case"CURSOR":case"TABLE":case"TEXT":case"BYTE":case"LONG":case"DOUBLE":
+                    CoincidirTipo("RESERVADAS");
+                    break;
+                default:
+                    Reportar(Preanalisis);
+                    break;
+        }
+    }
+    
     private void UPDATE1(){
         CoincidirTipo("IDENTIFICADOR");
         Coincidir("=");
         if ("DEFAULT".equals(Preanalisis) || "NULL".equals(Preanalisis)) {
             CoincidirTipo("RESERVADAS");
         }else{
-            W1();                                                   //EXPRESIONES
+            Expresiones();                                                   //EXPRESIONES
         }
         
         if (",".equals(Preanalisis)) {
@@ -698,7 +820,7 @@ public class minisql extends javax.swing.JFrame {
                         CoincidirTipo("RESERVADAS");
                         Coincidir("(");
                         S1();                                       //ALL|DISTINCT
-                        W1();                                       //Expression
+                        Expresiones();                                       //Expression
                         Coincidir(")");
                         break;
                     case "COUNT":
@@ -710,7 +832,7 @@ public class minisql extends javax.swing.JFrame {
                             Coincidir(")");
                         } else{
                             S1();
-                            W1();
+                            Expresiones();
                             Coincidir(")");
                         }
                         break;
@@ -720,82 +842,14 @@ public class minisql extends javax.swing.JFrame {
                 }
                 break;
             case "IDENTIFICADOR":case "CADENA": case "ENTERO":case "DECIMAL":case "FLOAT":case "CARACTERES":
-                W1();
+                Expresiones();
                 break;
             default:
                 break;
         }
         W5();
     }
-    /**
-     * EXPRESSIONES
-     */
-    private void W1(){
-        switch(TipoToken){
-            case "IDENTIFICADOR":
-                CoincidirTipo("IDENTIFICADOR");                 //Posible columna
-                ID2();                                          //En caso de que lo anterior sea Tabla
-                W4();
-                break;
-            case "CADENA":
-                CoincidirTipo("CADENA");
-                W4();
-                break;
-            case "ENTERO":
-                CoincidirTipo("ENTERO");
-                W4();
-                break;
-            case "DECIMAL":
-                CoincidirTipo("DECIMAL");
-                W4();
-                break;
-            case "FLOAT":
-                CoincidirTipo("FLOAT");
-                W4();
-                break;
-            case "CARACTERES":
-                switch(Preanalisis){
-                    case "(":
-                        Coincidir("(");
-                        W1();
-                        Coincidir(")");
-                        break;
-                    default:
-                        Reportar(Preanalisis);
-                        break;
-                }
-                break;
-            case "RESERVADAS":
-                switch(Preanalisis){
-                    case "SUM":case "MAX":case "MIN":
-                        CoincidirTipo("RESERVADAS");
-                        Coincidir("(");
-                        S1();                                           //ALL | DISTINCT
-                        W1();
-                        Coincidir(")");
-                        break;
-                    case "COUNT":
-                        CoincidirTipo("RESERVADAS");
-                        Coincidir("(");
-                        
-                        if ("*".equals(Preanalisis)) {
-                            Coincidir("*");
-                            Coincidir(")");
-                        } else{
-                            S1();                                    //ALL | DISTINCT
-                            W1();                                    //EXPRESIONES
-                            Coincidir(")");
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            default:
-                Reportar(Preanalisis);
-                break;
-        }
-    }
+    
     
     /**
      * AND | OR NOT
@@ -834,7 +888,7 @@ public class minisql extends javax.swing.JFrame {
         switch(Preanalisis){
             case "+":case "-":case "*":case "/":case "%":
                 CoincidirTipo("CARACTERES");
-                W1();
+                Expresiones();
                 break;
             default:
                 break;
@@ -848,7 +902,7 @@ public class minisql extends javax.swing.JFrame {
         switch(Preanalisis){
             case"=":case"!=":case">":case">=":case"<":case"<=":
                 CoincidirTipo("CARACTERES");
-                W1();
+                Expresiones();
                 break;
             case "NOT":
                 Coincidir("NOT");
@@ -862,9 +916,9 @@ public class minisql extends javax.swing.JFrame {
                 }
                 else if ("BETWEEN".equals(Preanalisis)) {
                     Coincidir("BETWEEN");
-                    W1();
+                    Expresiones();
                     Coincidir("AND");
-                    W1();
+                    Expresiones();
                 }
                 else{
                     Reportar(Preanalisis);
@@ -889,9 +943,9 @@ public class minisql extends javax.swing.JFrame {
                 break;
             case "BETWEEN":
                 Coincidir("BETWEEN");
-                W1();
+                Expresiones();
                 Coincidir("AND");
-                W1();
+                Expresiones();
                 break;
             default:
                 break;
@@ -969,7 +1023,14 @@ public class minisql extends javax.swing.JFrame {
     
 
      private void Reportar(String text){ //PENDIENTE
-        errores++;
+        try{
+            throw new NullPointerException("demo"); 
+        }catch(NullPointerException e){
+            errores++;
+            TokenError += text + "\n";
+            throw e;
+        }
+        
     }
     
     /**

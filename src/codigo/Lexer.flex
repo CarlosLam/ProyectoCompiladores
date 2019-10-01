@@ -120,6 +120,7 @@ espacio=[ \t\r\n]
 "DATA" |
 "DATABASE" |
 "DATE" |
+"DATETME" |
 "DAY" |
 "DBCC" |
 "DEALLOCATE" |
@@ -277,6 +278,7 @@ espacio=[ \t\r\n]
 "NULL" |
 "NULLIF" |
 "NUMERIC" |
+"NVARCHAR" |
 "OBJECT" |
 "OCCURRENCES_REGEX" |
 "OCTET_LENGTH" |
