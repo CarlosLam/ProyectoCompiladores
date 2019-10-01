@@ -292,6 +292,47 @@ public class minisql extends javax.swing.JFrame {
                             W();                                    //METODO
                         }
                         break;
+                    case "DELETE":
+                        Coincidir("DELETE");
+                        S2();      
+                        
+                        if ("OUTPUT".equals(Preanalisis)) {
+                            Output();
+                        }
+                        if ("FROM".equals(Preanalisis)) {
+                            Coincidir("FROM");
+                            F1();                           //METODO FROM
+                            
+                            if (Contador < Palabras.length) {
+                                switch(Preanalisis){
+                                    case "INNER":
+                                        CoincidirTipo("RESERVADAS");            //INNER
+                                        J1();                                   //RESTO DEL JOIN
+                                        break;
+                                    case "LEFT":case "RIGHT":case "FULL":
+                                        CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
+                                        
+                                        if ("OUTER".equals(Preanalisis)){       //OUTER
+                                           Coincidir("OUTER");                              
+                                        }
+                                        J1();                                   //Resto del JOIN
+                                        break;
+                                    case "JOIN":
+                                        J1();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        }
+                        if ("WHERE".equals(Preanalisis)) {
+                            Coincidir("WHERE");                     //WHERE
+                            W();                                    //METODO
+                        }
+                        break;
+                    case "CREATE":
+                        
+                        break;
                     default://Error de palabra de incio - pasaremos a la siguiente palabra?
                         break;  
                 }
