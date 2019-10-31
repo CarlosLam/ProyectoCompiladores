@@ -18,492 +18,126 @@ espacio=[ \t\r\n]
     public int lin;
 %}
 %%
-"ABSOLUTE" |
-"ACTION" |
-"ADA" |
-"ADD" |
-"ADMIN" |
-"AFTER" |
-"AGGREGATE" |
-"ALIAS" |
-"ALL" |
-"ALLOCATE" |
-"ALTER" |
-"ALTER" |
-"AND" |
-"ANY" |
-"ARE" |
-"ARRAY" |
-"AS" |
-"ASC" |
-"ASENSITIVE" |
-"ASSERTION" |
-"ASYMMETRIC" |
-"AT" |
-"ATOMIC" |
-"AUTHORIZATION" |
-"AVG" |
-"BACKUP" |
-"BEFORE" |
-"BEGIN" |
-"BETWEEN" |
-"BINARY" |
-"BIT" |
-"BIT_LENGTH" |
-"BLOB" |
-"BOOLEAN" |
-"BOTH" |
-"BREADTH" |
-"BREAK" |
-"BROWSE" |
-"BULK" |
-"BY" |
-"CALL" |
-"CALLED" |
-"CARDINALITY" |
-"CASCADE" |
-"CASCADED" |
-"CASE" |
-"CAST" |
-"CATALOG" |
-"CHAR" |
-"CHAR_LENGTH" |
-"CHARACTER" |
-"CHARACTER_LENGTH" |
-"CHECK" |
-"CHECKPOINT" |
-"CLASS" |
-"CLOB" |
-"CLOSE" |
-"CLUSTERED" |
-"COALESCE" |
-"COLLATE" |
-"COLLATION" |
-"COLLECT" |
-"COLUMN" |
-"COMMIT" |
-"COMPLETION" |
-"COMPUTE" |
-"CONDITION" |
-"CONNECT" |
-"CONNECTION" |
-"CONSTRAINT" |
-"CONSTRAINTS" |
-"CONSTRUCTOR" |
-"CONTAINS" |
-"CONTAINSTABLE" |
-"CONTINUE" |
-"CONVERT" |
-"CONVERT" |
-"CORR" |
-"CORRESPONDING" |
-"COUNT" |
-"COVAR_POP" |
-"COVAR_SAMP" |
-"CREATE" |
-"CROSS" |
-"CUBE" |
-"CUME_DIST" |
-"CURRENT" |
-"CURRENT_CATALOG" |
-"CURRENT_DATE" |
-"CURRENT_DEFAULT_TRANSFORM_GROUP" |
-"CURRENT_PATH" |
-"CURRENT_ROLE" |
-"CURRENT_SCHEMA" |
-"CURRENT_TIME" |
-"CURRENT_TIMESTAMP" |
-"CURRENT_TRANSFORM_GROUP_FOR_TYPE" |
-"CURRENT_USER" |
-"CURSOR" |
-"CYCLE" |
-"DATA" |
-"DATABASE" |
-"DATE" |
-"DATETME" |
-"DAY" |
-"DBCC" |
-"DEALLOCATE" |
-"DEC" |
-"DECIMAL" |
-"DECLARE" |
-"DEFAULT" |
-"DEFERRABLE" |
-"DEFERRED" |
-"DELETE" |
-"DENY" |
-"DEPTH" |
-"DEREF" |
-"DESC" |
-"DESCRIBE" |
-"DESCRIPTOR" |
-"DESTROY" |
-"DESTRUCTOR" |
-"DETERMINISTIC" |
-"DIAGNOSTICS" |
-"DICTIONARY" |
-"DISCONNECT" |
-"DISK" |
-"DISTINCT" |
-"DISTRIBUTED" |
-"DOMAIN" |
-"DOUBLE" |
-"DROP" |
-"DUMP" |
-"DYNAMIC" |
-"EACH" |
-"ELEMENT" |
-"ELSE" |
-"END" |
-"END-EXEC" |
-"EQUALS" |
-"ERRLVL" |
-"ESCAPE" |
-"EVERY" |
-"EXCEPT" |
-"EXCEPTION" |
-"EXEC" |
-"EXECUTE" |
-"EXISTS" |
-"EXIT" |
-"EXTERNAL" |
-"EXTRACT"  |
-"FALSE" |
-"FETCH" |
-"FILE" |
-"FILLFACTOR" |
-"FILTER" |
-"FIRST" |
-"FLOAT" |
-"FOR" |
-"FOREIGN" |
-"FORTRAN" |
-"FOUND" |
-"FREE" |
-"FREETEXT" |
-"FREETEXTTABLE" |
-"FROM" |
-"FULL" |
-"FULLTEXTTABLE" |
-"FUNCTION" |
-"FUSION" |
-"GENERAL" |
-"GET" |
-"GLOBAL" |
-"GO" |
-"GOTO" |
-"GRANT" |
-"GROUP" |
-"GROUPING" |
-"HAVING" |
-"HOLD" |
-"HOLDLOCK" |
-"HOST" |
-"HOUR" |
-"IDENTITY" |
-"IDENTITY_INSERT" |
-"IDENTITYCOL" |
-"IF" |
-"IGNORE" |
-"IMMEDIATE" |
-"IN" |
-"INCLUDE" |
-"INDEX" |
-"INDICATOR" |
-"INITIALIZE" |
-"INITIALLY" |
-"INNER" |
-"INOUT" |
-"INPUT" |
-"INSENSITIVE" |
-"INSERT" |
-"INT" |
-"INTEGER" |
-"INTERSECT" |
-"INTERSECTION" |
-"INTERVAL" |
-"INTO" |
-"IS" |
-"ISOLATION" |
-"ITERATE" |
-"JOIN" |
-"KEY" |
-"KILL" |
-"LANGUAGE" |
-"LARGE" |
-"LAST" |
-"LATERAL" |
-"LEADING" |
-"LEFT" |
-"LESS" |
-"LEVEL" |
-"LIKE" |
-"LIKE_REGEX" |
-"LIMIT" |
-"LINENO" |
-"LN" |
-"LOAD" |
-"LOCAL" |
-"LOCALTIME" |
-"LOCALTIMESTAMP" |
-"LOCATOR" |
-"LOWER" |
-"MAP" |
-"MATCH" |
-"MAX" |
-"MEMBER" |
-"MERGE" |
-"METHOD" |
-"MIN" |
-"MINUTE" |
-"MOD" |
-"MODIFIES" |
-"MODIFY" |
-"MODULE" |
-"MONTH" |
-"MULTISET" |
-"NAMES" |
-"NATIONAL" |
-"NATURAL" |
-"NCHAR" |
-"NCLOB" |
-"NEW" |
-"NEXT" |
-"NO" |
-"NOCHECK" |
-"NONCLUSTERED" |
-"NONE" |
-"NORMALIZE" |
-"NOT" |
-"NULL" |
-"NULLIF" |
-"NUMERIC" |
-"NVARCHAR" |
-"OBJECT" |
-"OCCURRENCES_REGEX" |
-"OCTET_LENGTH" |
-"OF" |
-"OFF" |
-"OFFSETS" |
-"OLD" |
-"ON" |
-"ONLY" |
-"OPEN" |
-"OPENDATASOURCE" |
-"OPENQUERY" |
-"OPENROWSET" |
-"OPENXML" |
-"OPERATION" |
-"OPTION" |
-"OR" |
-"ORDER" |
-"ORDINALITY" |
-"OUT" |
-"OUTER" |
-"OUTPUT" |
-"OVER" |
-"OVERLAPS" |
-"OVERLAY" |
-"PAD" |
-"PARAMETER" |
-"PARAMETERS" |
-"PARTIAL" |
-"PARTITION" |
-"PASCAL" |
-"PATH" |
-"PERCENT" |
-"PERCENT_RANK" |
-"PERCENTILE_CONT" |
-"PERCENTILE_DISC" |
-"PIVOT" |
-"PLAN" |
-"POSITION" |
-"POSITION_REGEX" |
-"POSTFIX" |
-"PRECISION" |
-"PREFIX" |
-"PREORDER" |
-"PREPARE" |
-"PRESERVE" |
-"PRIMARY" |
-"PRINT" |
-"PRIOR" |
-"PRIVILEGES" |
-"PROC" |
-"PROCEDURE" |
-"PUBLIC" |
-"RAISERROR" |
-"RANGE" |
-"READ" |
-"READS" |
-"READTEXT" |
-"REAL" |
-"RECONFIGURE" |
-"RECURSIVE" |
-"REF" |
-"REFERENCES" |
-"REFERENCING" |
-"REGR_AVGX" |
-"REGR_COUNT" |
-"REGR_INTERCEPT" |
-"REGR_R2" |
-"REGR_SLOPE" |
-"REGR_SXX" |
-"REGR_SXY" |
-"REGR_SYY"|
-"RELATIVE" |
-"RELEASE" |
-"REPLICATION" |
-"RESTORE" |
-"RESTRICT" |
-"RESULT" |
-"RETURN" |
-"RETURNS" |
-"REVERT" |
-"REVOKE" |
-"RIGHT" |
-"ROLE" |
-"ROLLBACK" |
-"ROLLUP" |
-"ROUTINE" |
-"ROW" |
-"ROWCOUNT" |
-"ROWGUIDCOL" |
-"ROWS" |
-"RULE" |
-"SAVE" |
-"SAVEPOINT" |
-"SCHEMA" |
-"SCOPE" |
-"SCROLL" |
-"SEARCH" |
-"SECOND" |
-"SECTION" |
-"SECURITYAUDIT" |
-"SELECT" |
-"SEMANTICKEYPHRASETABLE" |
-"SEMANTICSIMILARITYDETAILSTABLE" |
-"SEMANTICSIMILARITYTABLE" |
-"SENSITIVE" |
-"SEQUENCE" |
-"SESSION" |
-"SESSION_USER" |
-"SET" |
-"SETS" |
-"SETUSER" |
-"SHUTDOWN" |
-"SIMILAR" |
-"SIZE" |
-"SMALLINT" |
-"SOME" |
-"SPACE" |
-"SPECIFIC" |
-"SPECIFICTYPE" |
-"SQL" |
-"SQLCA" |
-"SQLCODE" |
-"SQLERROR" |
-"SQLEXCEPTION" |
-"SQLSTATE" |
-"SQLWARNING" |
-"START" |
-"STATE" |
-"STATEMENT" |
-"STATIC" |
-"STATISTICS" |
-"STDDEV_POP" |
-"STDDEV_SAMP" |
-"STRUCTURE" |
-"SUBMULTISET" |
-"SUBSTRING" |
-"SUBSTRING_REGEX" |
-"SUM" |
-"SYMMETRIC" |
-"SYSTEM" |
-"SYSTEM_USER" |
-"TABLE" |
-"TABLESAMPLE" |
-"TEMPORARY" |
-"TERMINATE" |
-"TEXTSIZE" |
-"THAN" |
-"THEN" |
-"TIME" |
-"TIMESTAMP" |
-"TIMEZONE_HOUR" |
-"TIMEZONE_MINUTE" |
-"TO" |
-"TOP" |
-"TRAILING" |
-"TRAN" |
-"TRANSACTION" |
-"TRANSLATE" |
-"TRANSLATE_REGEX" |
-"TRANSLATION" |
-"TREAT" |
-"TRIGGER" |
-"TRIM" |
-"TRUE" |
-"TRUNCATE" |
-"TRY_CONVERT" |
-"TSEQUAL" |
-"UESCAPE" |
-"UNDER" |
-"UNION" |
-"UNIQUE" |
-"UNKNOWN" |
-"UNNEST" |
-"UNPIVOT" |
-"UPDATE" |
-"UPDATETEXT" |
-"UPPER" |
-"USAGE" |
-"USE" |
-"USER" |
-"USING" |
-"VALUE" |
-"VALUES" |
-"VAR_POP" |
-"VAR_SAMP" |
-"VARCHAR" |
-"VARIABLE" |
-"VARYING" |
-"VIEW" |
-"WAITFOR" |
-"WHEN" |
-"WHENEVER" |
-"WHERE" |
-"WHILE" |
-"WIDTH_BUCKET" |
-"WINDOW" |
-"WITH" |
-"WITHIN" |
-"WITHIN GROUP" |
-"WITHOUT" |
-"WORK" |
-"WRITE" |
-"WRITETEXT" |
-"XMLAGG" |
-"XMLATTRIBUTES" |
-"XMLBINARY" |
-"XMLCAST" |
-"XMLCOMMENT" |
-"XMLCONCAT" |
-"XMLDOCUMENT" |
-"XMLELEMENT" |
-"XMLEXISTS" |
-"XMLFOREST" |
-"XMLITERATE" |
-"XMLNAMESPACES" |
-"XMLPARSE" |
-"XMLPI" |
-"XMLQUERY" |
-"XMLSERIALIZE" |
-"XMLTABLE" |
-"XMLTEXT" |
-"XMLVALIDATE" |
-"YEAR" |
-"ZONE" {lexeme=yytext(); lin=yyline; col=yycolumn; return Reservadas;}
+
+
+/* DML with out subquerys*/
+"SELECT" {lexeme=yytext(); row = yyline; col = yycolumn; return select;} 
+"INSERT" {lexeme=yytext(); row = yyline; col = yycolumn; return insert;} 
+"UPDATE" {lexeme=yytext(); row = yyline; col = yycolumn; return update;} 
+"DELETE" {lexeme=yytext(); row = yyline; col = yycolumn; return delete;} 
+
+/* DDL */
+"CREATE" {lexeme=yytext(); row = yyline; col = yycolumn; return create;} 
+"ALTER" {lexeme=yytext(); row = yyline; col = yycolumn; return alter;} 
+"DROP" {lexeme=yytext(); row = yyline; col = yycolumn; return drop;} 
+"TRUNCATE" {lexeme=yytext(); row = yyline; col = yycolumn; return truncate;} 
+
+/* TCL */
+"BEGIN" {lexeme=yytext(); row = yyline; C1 = yycolumn; return begin;} 
+"TRANSACTION" {lexeme=yytext(); row = yyline; C1 = yycolumn; return transaction;} 
+"COMMIT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return commit;}     
+"ROLLBACK" {lexeme=yytext(); row = yyline; C1 = yycolumn; return rollback;} 
+"SAVE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return save;} 
+"POINT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return point;} 
+"END" {lexeme=yytext(); row = yyline; C1 = yycolumn; return end;} 
+"FUNCTION" {lexeme=yytext(); row = yyline; C1 = yycolumn; return function;} 
+"CURSOR" {lexeme=yytext(); row = yyline; C1 = yycolumn; return cursor;} 
+"PROCEDURE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return procedure;} 
+/* Reservadas */
+"JOIN" {lexeme=yytext(); row = yyline; C1 = yycolumn; return join;} 
+"INNER" {lexeme=yytext(); row = yyline; C1 = yycolumn; return inner;} 
+"LEFT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return left;} 
+"RIGHT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return right;}
+"OUTER" {lexeme=yytext(); row = yyline; C1 = yycolumn; return outer;} 
+"VIEW" {lexeme=yytext(); row = yyline; C1 = yycolumn; return view;}     
+"IF" {lexeme=yytext(); row = yyline; C1 = yycolumn; return iflit;} 
+"ELSE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return elselit;} 
+"FROM" {lexeme=yytext(); row = yyline; C1 = yycolumn; return from;} 
+"BETWEEN" {lexeme=yytext(); row = yyline; C1 = yycolumn; return between;} 
+"GRANT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return grant;} 
+"REVOKE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return revoke;} 
+"GROUP" {lexeme=yytext(); row = yyline; C1 = yycolumn; return group;} 
+"BY" {lexeme=yytext(); row = yyline; C1 = yycolumn; return by;} 
+"RESTORE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return restore;} 
+"TABLE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return table;} 
+"VARCHAR" {lexeme=yytext(); row = yyline; C1 = yycolumn; return varchar;} 
+"INT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return intlit;} 
+"BIT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return bitlit;} 
+"IDENTITY" {lexeme=yytext(); row = yyline; C1 = yycolumn; return identity;} 
+"NOT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return notlit;} 
+"NULL" {lexeme=yytext(); row = yyline; C1 = yycolumn; return nulllit;} 
+"CONSTRAIN" {lexeme=yytext(); row = yyline; C1 = yycolumn; return constrain;} 
+"PRIMARY" {lexeme=yytext(); row = yyline; C1 = yycolumn; return primary;} 
+"ASC" {lexeme=yytext(); row = yyline; C1 = yycolumn; return asc;} 
+"ASCENDENT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return ascfull;} 
+"DESCENDENT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return descfull;} 
+"USER" {lexeme=yytext(); row = yyline; C1 = yycolumn; return user;} 
+"DESC" {lexeme=yytext(); row = yyline; C1 = yycolumn; return desc;} 
+"INDEX" {lexeme=yytext(); row = yyline; C1 = yycolumn; return index;} 
+"DATABASE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return db;}
+"STORED" {lexeme=yytext(); row = yyline; C1 = yycolumn; return stored;} 
+"VALUE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return value;} 
+"SET" {lexeme=yytext(); row = yyline; C1 = yycolumn; return set;} 
+"SUM" {lexeme=yytext(); row = yyline; C1 = yycolumn; return sum;} 
+"COUNT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return count;}
+"GO" {lexeme=yytext(); row = yyline; C1 = yycolumn; return go;} 
+"AVG" {lexeme=yytext(); row = yyline; C1 = yycolumn; return avg;} 
+"FLOAT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return floatlit;} 
+"WHERE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return wherelit;} 
+"OR" {lexeme=yytext(); row = yyline; C1 = yycolumn; return orlit;} 
+"OF" {lexeme=yytext(); row = yyline; C1 = yycolumn; return oflit;}
+"WHEN" {lexeme=yytext(); row = yyline; C1 = yycolumn ; return whenlit;} 
+"WITH" {lexeme=yytext(); row = yyline; C1 = yycolumn; return withlit;} 
+"EXIT" {lexeme=yytext(); row = yyline; C1 = yycolumn; return exit;} 
+"TOP" {lexeme=yytext(); row = yyline; C1 = yycolumn; return top;} 
+"CHAR" {lexeme=yytext(); row = yyline; C1 = yycolumn; return charlit;} 
+"INTEGER" {lexeme=yytext(); row = yyline; C1 = yycolumn; return integerlit;} 
+"MIN" {lexeme=yytext(); row = yyline; C1 = yycolumn; return min;} 
+"MAX" {lexeme=yytext(); row = yyline; C1 = yycolumn; return max;} 
+"USE" {lexeme=yytext(); row = yyline; C1 = yycolumn; return use;} 
+"IN" {lexeme=yytext(); row = yyline; C1 = yycolumn; return use;} 
+"IS"  {lexeme=yytext(); row = yyline; C1 = yycolumn; return is;} 
+"ON"  {lexeme=yytext(); row = yyline; C1 = yycolumn; return on;} 
+
+/* Datos */
+({digit})+ {lexeme = yytext();row = yyline; C1 = yycolumn;return Entero;}
+\'{SChar}*\' {lexeme=yytext(); row=yyline;  C1=yycolumn;return Cadena;}
+{Float} {lexeme=yytext(); row=yyline; C1=yycolumn; return Float;}
+{Ident}{31,100} {lexeme=yytext(); row = yyline; C1 = yycolumn; return IdentificadorExcedido;}
+{Ident} {lexeme=yytext(); row = yyline; C1 = yycolumn; return Identificador;}
+{Id} {lexeme=yytext(); row = yyline; C1 = yycolumn; return Id;}
+/* Operands & characters   */
+{empty} {/*Ignore*/}
+"=" {lexeme=yytext();row=yyline; C1=yycolumn;return igual;} 
+"+" {lexeme=yytext();row=yyline; C1=yycolumn;return suma;}
+"-" {lexeme=yytext();row=yyline; C1=yycolumn;return resta;}
+"*" {lexeme=yytext();row=yyline; C1=yycolumn;return multiplicacion;}
+"/" {lexeme=yytext();row=yyline; C1=yycolumn;return division;}
+(,) {lexeme=yytext();row = yyline; C1 = yycolumn;  return coma;}
+"." {lexeme=yytext();row = yyline; C1 = yycolumn;  return punto;}
+"<" {lexeme=yytext();row = yyline; C1 = yycolumn;  return menor;}
+"<=" {lexeme=yytext();row = yyline; C1 = yycolumn;  return menorigual;}
+">" {lexeme=yytext();row = yyline; C1 = yycolumn;  return mayor;} 
+">=" {lexeme=yytext();row = yyline; C1 = yycolumn;  return mayorigual;}
+"=" {lexeme=yytext();row = yyline; C1 = yycolumn;  return assign;} 
+"==" {lexeme=yytext();row = yyline; C1 = yycolumn;  return comparation;}
+"<>" {lexeme=yytext();row = yyline; C1 = yycolumn;  return different;}
+"&&" {lexeme=yytext();row = yyline; C1 = yycolumn;  return and;}
+"||" {lexeme=yytext();row = yyline; C1 = yycolumn;  return or;} 
+"!" {lexeme=yytext();row = yyline; C1 = yycolumn;  return exclamation;} 
+";" {lexeme=yytext();row = yyline; C1 = yycolumn;  return semicolon;}
+"[" {lexeme=yytext();row = yyline; C1 = yycolumn;  return corcheteO;}
+"]" {lexeme=yytext();row = yyline; C1 = yycolumn;  return corcheteC;}
+"(" {lexeme=yytext();row = yyline; C1 = yycolumn;  return parentesisO;}
+")" {lexeme=yytext();row = yyline; C1 = yycolumn;  return parentesisC;}
+"{" {lexeme=yytext();row = yyline; C1 = yycolumn;  return llaveO;}
+"}" {lexeme=yytext();row = yyline; C1 = yycolumn;  return llaveC;}
+"[]" {lexeme=yytext();row = yyline; C1 = yycolumn;  return corchetes;}
+"()" {lexeme=yytext();row = yyline; C1 = yycolumn;  return parentesis;}
+"{}" {lexeme=yytext();row = yyline; C1 = yycolumn;  return llaves;}
+"@" {lexeme=yytext();row = yyline; C1 = yycolumn;  return at;}
+"#" {lexeme=yytext();row = yyline; C1 = yycolumn;  return numeral;}
+"##" {lexeme=yytext();row = yyline; C1 = yycolumn;  return dnumeral;}
 
 {espacio} |
 "--".* | 
@@ -524,36 +158,5 @@ espacio=[ \t\r\n]
 {D}+{P}{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Decimal;}
 
 {D}+{P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Float;}
-
-"+" |
-"-" |
-"*" |
-"/" |
-"<" |
-"<=" |
-">" |
-">=" |
-"=" |
-"==" |
-"!=" |
-"&&" |
-"||" |
-"%" |
-"!" |
-";" |
-"," |
-"." |
-"[" |
-"]" |
-"[]" |
-"(" |
-")" |
-"()" |
-"{" |
-"}" |
-"{}" |
-"@" |
-"#" |    
-"##" {lexeme=yytext(); lin=yyline; col=yycolumn; return Caracteres;}
 
  . {lexeme=yytext(); lin=yyline; col=yycolumn; return ERROR;}
