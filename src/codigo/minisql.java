@@ -232,10 +232,8 @@ public class minisql extends javax.swing.JFrame {
                                     O();                                    //METODO
                                 }
                             }
-
                             if ((Contador < Palabras.length)) 
                                 Reportar(Preanalisis);                      //No debe haber sentencias luego de las enlistadas anteriormente
-
                             break;
                         case "INSERT":
                             Coincidir("INSERT");
@@ -347,6 +345,10 @@ public class minisql extends javax.swing.JFrame {
                                     break;
                                 default:break;
                             }
+                            break;
+                        case "DECLARE":
+                            Coincidir("DECLARE");
+                            
                             break;
                         default://Error de palabra de incio - pasaremos a la siguiente palabra?
                             break;  
@@ -534,9 +536,7 @@ public class minisql extends javax.swing.JFrame {
      */
     private void ID1(){                                         //Cuando suponemos que algo acompaña al table
         if (".".equals(Preanalisis)) {
-            
             Coincidir(".");
-            
             switch(TipoToken){                                  //Puede venir ID, *, $IDENTITY
                 case "IDENTIFICADOR":
                     CoincidirTipo("IDENTIFICADOR");
@@ -640,6 +640,12 @@ public class minisql extends javax.swing.JFrame {
     
     private void O(){
         G();
+        if ("ASC".equals(Preanalisis)) {
+            Coincidir("ASC");
+        }
+        else if ("DESC".equals(Preanalisis)) {
+            Coincidir("DESC");
+        }
     }
     /**
      * METODO DE OUTPUT
@@ -732,6 +738,8 @@ public class minisql extends javax.swing.JFrame {
                 break;
             case "RESERVADAS":
                 Expresiones();
+                AS1();                                          //Puede venir o no un AS ...
+                CoincidirComa();                                //Puede venir una coma ,
                 break;
             case "IDENTIFICADOR":
                 CoincidirTipo("IDENTIFICADOR");
@@ -974,10 +982,8 @@ public class minisql extends javax.swing.JFrame {
     private void CoincidirAS(){
         if("CADENA".equals(TipoToken))
             CoincidirTipo("CADENA");
-        
         else if("IDENTIFICADOR".equals(TipoToken))
             CoincidirTipo("IDENTIFICADOR");
-        
         else
             Reportar(Preanalisis);
     }

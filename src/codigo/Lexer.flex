@@ -513,7 +513,7 @@ espacio=[ \t\r\n]
 "/*" .*|
 "*/" .* {lin=yyline; return ErrorMultilinea;}
 
-
+{@}{L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Variable;}
 "'" ~"'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 ("'"([^'\r\n]*)) {lexeme=yytext(); lin=yyline; return ErrorApertura;}
 {L}({L}|{D}){31,100} {lexeme=yytext(); lin=yyline; col=yycolumn; return IdentificadorOver;}
