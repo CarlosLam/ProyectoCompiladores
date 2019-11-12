@@ -10,6 +10,7 @@ package codigo;
  * @author lam_m
  */
 public enum Tokens {
+    Datatype,
     Variable,
     Reservadas,
     Comparador,

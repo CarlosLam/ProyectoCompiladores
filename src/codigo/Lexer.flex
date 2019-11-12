@@ -18,6 +18,21 @@ espacio=[ \t\r\n]
     public int lin;
 %}
 %%
+
+"CHAR" |
+"BIT" |
+"FLOAT" |
+"NVARCHAR" |
+"VARCHAR" |
+"NCHAR" |
+"INT" |
+"REAL" |
+"DATE" |
+"DATETME" |
+"NUMERIC" |
+"TIME" |
+"DECIMAL" {lexeme=yytext(); lin=yyline; col=yycolumn; return Datatype;}
+
 "ABSOLUTE" |
 "ACTION" |
 "ADA" |
@@ -48,7 +63,6 @@ espacio=[ \t\r\n]
 "BEGIN" |
 "BETWEEN" |
 "BINARY" |
-"BIT" |
 "BIT_LENGTH" |
 "BLOB" |
 "BOOLEAN" |
@@ -66,7 +80,6 @@ espacio=[ \t\r\n]
 "CASE" |
 "CAST" |
 "CATALOG" |
-"CHAR" |
 "CHAR_LENGTH" |
 "CHARACTER" |
 "CHARACTER_LENGTH" |
@@ -119,13 +132,10 @@ espacio=[ \t\r\n]
 "CYCLE" |
 "DATA" |
 "DATABASE" |
-"DATE" |
-"DATETME" |
 "DAY" |
 "DBCC" |
 "DEALLOCATE" |
 "DEC" |
-"DECIMAL" |
 "DECLARE" |
 "DEFAULT" |
 "DEFERRABLE" |
@@ -174,7 +184,6 @@ espacio=[ \t\r\n]
 "FILLFACTOR" |
 "FILTER" |
 "FIRST" |
-"FLOAT" |
 "FOR" |
 "FOREIGN" |
 "FORTRAN" |
@@ -217,7 +226,6 @@ espacio=[ \t\r\n]
 "INPUT" |
 "INSENSITIVE" |
 "INSERT" |
-"INT" |
 "INTEGER" |
 "INTERSECT" |
 "INTERSECTION" |
@@ -265,7 +273,6 @@ espacio=[ \t\r\n]
 "NAMES" |
 "NATIONAL" |
 "NATURAL" |
-"NCHAR" |
 "NCLOB" |
 "NEW" |
 "NEXT" |
@@ -277,8 +284,6 @@ espacio=[ \t\r\n]
 "NOT" |
 "NULL" |
 "NULLIF" |
-"NUMERIC" |
-"NVARCHAR" |
 "OBJECT" |
 "OCCURRENCES_REGEX" |
 "OCTET_LENGTH" |
@@ -337,7 +342,6 @@ espacio=[ \t\r\n]
 "READ" |
 "READS" |
 "READTEXT" |
-"REAL" |
 "RECONFIGURE" |
 "RECURSIVE" |
 "REF" |
@@ -428,7 +432,6 @@ espacio=[ \t\r\n]
 "TEXTSIZE" |
 "THAN" |
 "THEN" |
-"TIME" |
 "TIMESTAMP" |
 "TIMEZONE_HOUR" |
 "TIMEZONE_MINUTE" |
@@ -465,7 +468,6 @@ espacio=[ \t\r\n]
 "VALUES" |
 "VAR_POP" |
 "VAR_SAMP" |
-"VARCHAR" |
 "VARIABLE" |
 "VARYING" |
 "VIEW" |
@@ -513,16 +515,12 @@ espacio=[ \t\r\n]
 "/*" .*|
 "*/" .* {lin=yyline; return ErrorMultilinea;}
 
-{@}{L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Variable;}
+@{L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Variable;}
 "'" ~"'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 ("'"([^'\r\n]*)) {lexeme=yytext(); lin=yyline; return ErrorApertura;}
-{L}({L}|{D}){31,100} {lexeme=yytext(); lin=yyline; col=yycolumn; return IdentificadorOver;}
 {L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Identificador;}
-
 {D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return Entero;}
-
 {D}+{P}{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Decimal;}
-
 {D}+{P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Float;}
 
 "+" |

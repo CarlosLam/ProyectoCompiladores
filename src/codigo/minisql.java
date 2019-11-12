@@ -11,6 +11,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -109,13 +116,14 @@ public class minisql extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnLoadFlexActionPerformed
 
-    
     private String Preanalisis = "";
     private String TipoToken = "";
     private String[] Palabras;
     private int Contador = 0;
     private int errores = 0;
     private String TokenError = "";
+    public String[] arreglo = new String[2];
+    public Dictionary TS = new Hashtable();
     
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
@@ -131,7 +139,6 @@ public class minisql extends javax.swing.JFrame {
             archivo = dialogo.getSelectedFile();
             rutaArchivo = archivo.getPath();
             String result = "";
-            
             try {
                 //Comenzar con la lectura del documento
                 Reader lector = new BufferedReader(new FileReader(archivo));
@@ -347,15 +354,55 @@ public class minisql extends javax.swing.JFrame {
                             }
                             break;
                         case "DECLARE":
+                            Queue<String> stack = new LinkedList();
                             Coincidir("DECLARE");
+                            stack.add(Preanalisis);
+                            CoincidirTipo("VARIABLE");
+                            if ("AS".equals(Preanalisis)) {
+                                Coincidir("AS");
+                            }
+                            if (",".equals(Preanalisis)) {
+                                do{
+                                    Coincidir(",");
+                                    stack.add(Preanalisis);
+                                    if ("AS".equals(Preanalisis)) {
+                                        Coincidir("AS");
+                                    }
+                                    CoincidirTipo("VARIABLE");
+                                }while(",".equals(Preanalisis));
+                            }
                             
+                            if ("DATATYPE".equals(TipoToken)) {
+                                if (stack.isEmpty()) {
+                                    Reportar("No se ha declarado ninguna variable");
+                                }
+                                else{
+                                    while(!stack.isEmpty()){
+                                        TS.put(stack.remove(), new Valor(Preanalisis));
+                                    }
+                                    CoincidirTipo("DATATYPE");
+                                }
+                            }
+                            break;
+                        case "SET":
+                            Coincidir("SET");
+                            Valor auxili = (Valor) TS.get(Preanalisis);
+                            switch(auxili.getTipo()){
+                                case "INT":
+                                    SetInt(Preanalisis, auxili);
+                                    break;
+                                case "FLOAT":
+                                    SetFloat(Preanalisis, auxili);
+                                    break;
+                                default:
+                                    Reportar("Se esperaba una variable." + Preanalisis);
+                                    break;
+                            }
                             break;
                         default://Error de palabra de incio - pasaremos a la siguiente palabra?
                             break;  
                     }
-                }catch(NullPointerException E){
-                    
-                }
+                }catch(NullPointerException E){ }
             }
             
             if (errores == 0) {
@@ -365,8 +412,8 @@ public class minisql extends javax.swing.JFrame {
             else{
                 //Sino llenamos de informacion el txtRespuesta
                 txtRespuesta.setText(TokenError);
-            }    
-        }   
+            }
+        }
     }//GEN-LAST:event_btnCargarSQLActionPerformed
 
     /**
@@ -752,6 +799,149 @@ public class minisql extends javax.swing.JFrame {
                 break;
         }
     }
+    private void SetFloat(String preanalis, Valor value){
+        List <String> lista = Postfijo();
+        Stack<Double> listaFinal = new Stack<>();
+        for (String var : lista){
+            switch(var){
+                case "+":
+                    double v1 = listaFinal.pop();
+                    double v2 = listaFinal.pop();
+                    listaFinal.push(v1+v2);
+                    break;
+                case "-":
+                    v1 = listaFinal.pop();
+                    v2 = listaFinal.pop();
+                    listaFinal.push(v1-v2);
+                    break;
+                case "*":
+                    v1 = listaFinal.pop();
+                    v2 = listaFinal.pop();
+                    listaFinal.push(v1*v2);
+                    break;
+                case "/":
+                    v1 = listaFinal.pop();
+                    v2 = listaFinal.pop();
+                    listaFinal.push(v1/v2);
+                    break;
+                default:
+                    double valor11 = Double.valueOf(var);
+                    listaFinal.add(valor11);
+                    break;
+            }
+        }
+        TS.remove(preanalis);
+        Valor nuevoValor = new Valor(value.getTipo());
+        nuevoValor.setValor(listaFinal.pop());
+        TS.put(preanalis, nuevoValor);
+    }
+    private void SetInt(String preanalis, Valor value){
+        List <String> lista = Postfijo();
+        Stack<Integer> listaFinal = new Stack<>();
+        for (String var : lista){
+            switch(var){
+                case "+":
+                    int v1 = listaFinal.pop();
+                    int v2 = listaFinal.pop();
+                    listaFinal.push(v1+v2);
+                    break;
+                case "-":
+                    v1 = listaFinal.pop();
+                    v2 = listaFinal.pop();
+                    listaFinal.push(v1-v2);
+                    break;
+                case "*":
+                    v1 = listaFinal.pop();
+                    v2 = listaFinal.pop();
+                    listaFinal.push(v1*v2);
+                    break;
+                case "/":
+                    v1 = listaFinal.pop();
+                    v2 = listaFinal.pop();
+                    listaFinal.push(v1/v2);
+                    break;
+                default:
+                    if (var.contains(".")) {
+                        double valor11 = Double.valueOf(var);
+                        listaFinal.add((int) valor11);
+                    }else
+                        listaFinal.add(Integer.valueOf(var));
+                    break;
+            }
+        }
+        //Tendremos que remover la variable y volverla a guardar con los nuevos datos.
+        
+        TS.remove(preanalis);
+        Valor nuevoValor = new Valor(value.getTipo());
+        nuevoValor.setValor(listaFinal.pop());
+        TS.put(preanalis, nuevoValor);
+    }
+    
+    public List<String> Postfijo(){
+        List<String> lista = new ArrayList<>();
+        Stack<String> cola = new Stack<>();
+        
+        CoincidirTipo("VARIABLE");
+        Coincidir("=");
+        while(haySiguiente()){
+            switch(TipoToken){
+                case "DECIMAL":
+                    lista.add(Preanalisis);
+                    CoincidirTipo("DECIMAL");
+                    break;
+                case "ENTERO":
+                    lista.add(Preanalisis);
+                    CoincidirTipo("ENTERO");
+                    break;
+                case "VARIABLE": //Debería ir a traer el valor de la variable
+                    Valor auxiliar1 = (Valor) TS.get(Preanalisis);
+                    lista.add(auxiliar1.getValor().toString());
+                    CoincidirTipo("VARIABLE");
+                    break;
+                case "CARACTERES":
+                    switch(Preanalisis){
+                        case "(":
+                            cola.push(Preanalisis);
+                            Coincidir("(");
+                            break;
+                        case ")":
+                            while(!cola.empty() && cola.peek() != "("){
+                                lista.add(cola.pop());
+                            }
+                            if (cola.isEmpty()) 
+                                Reportar("Hace falta un parentesis izquierdo");
+                            else{
+                                cola.pop();
+                                Coincidir(")");
+                            }
+                            break;
+                        case "+":case"-":
+                            while(!cola.empty() &&  (cola.peek() == "+" || cola.peek() == "-" || cola.peek() == "/" || cola.peek() == "*")){
+                                lista.add(cola.pop());
+                            }
+                            cola.push(Preanalisis);
+                            CoincidirTipo("CARACTERES");
+                            break;
+                        case "/":case "*":
+                            while(cola.peek() == "/" || cola.peek() == "*"){
+                                lista.add(cola.pop());
+                            }
+                            cola.push(Preanalisis);
+                            CoincidirTipo("CARACTERES");
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        while(!cola.empty()){
+            lista.add(cola.pop());
+        }
+        return lista;
+    }
     
     /**
      * Metodo para devolver ID, DATATYPE
@@ -977,6 +1167,10 @@ public class minisql extends javax.swing.JFrame {
                 TipoToken = aux[1];   
             }
         }
+    }
+    
+    private boolean haySiguiente(){
+        return Contador < Palabras.length;
     }
     
     private void CoincidirAS(){
