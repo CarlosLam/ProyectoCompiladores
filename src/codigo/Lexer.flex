@@ -519,6 +519,9 @@ espacio=[ \t\r\n]
 "'" ~"'" {lexeme=yytext(); col=yycolumn; lin=yyline; return Cadena;}
 ("'"([^'\r\n]*)) {lexeme=yytext(); lin=yyline; return ErrorApertura;}
 {L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Identificador;}
+{L}({L}|{D}|{G})*.{L}({L}|{D}|{G})* {lexeme=yytext(); lin=yyline; col=yycolumn; return Identificador2;}
+
+
 {D}+ {lexeme=yytext(); lin=yyline; col=yycolumn; return Entero;}
 {D}+{P}{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Decimal;}
 {D}+{P}{D}*("E"|"e"){S}?{D}* {lexeme=yytext(); lin=yyline; col=yycolumn; return Float;}

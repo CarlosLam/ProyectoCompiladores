@@ -182,66 +182,6 @@ public class minisql extends javax.swing.JFrame {
                 }
                 try{                
                     switch(Preanalisis){
-                        case "SELECT"://Cuando nos encontremos con un token de SELECT al inicio de una sentencia
-                            Coincidir("SELECT");
-                            S1();                               //ALL|DISTINCT
-                            S2();                               //TOP
-                            S3();                               //The columns to be selected for the result set
-                            if (Contador < Palabras.length) {   //Puede que se de el caso de que el select solo tenga expresiones
-                                Coincidir("FROM");
-                                F1();                           //METODO FROM
-
-                                if (Contador < Palabras.length) {
-                                    switch(Preanalisis){
-                                        case "INNER":
-                                            CoincidirTipo("RESERVADAS");            //INNER
-                                            J1();                                   //RESTO DEL JOIN
-                                            break;
-                                        case "LEFT":case "RIGHT":case "FULL":
-                                            CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-
-                                            if ("OUTER".equals(Preanalisis)){       //OUTER
-                                               Coincidir("OUTER");                              
-                                            }
-                                            J1();                                   //Resto del JOIN
-                                            break;
-                                        case "JOIN":
-                                            J1();
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                            if (Contador < Palabras.length) {
-                                if("WHERE".equals(Preanalisis)){
-                                    Coincidir("WHERE");                     //WHERE
-                                    W();                                    //METODO
-                                }
-                            }
-                            if (Contador < Palabras.length) {
-                                if("GROUP".equals(Preanalisis)){
-                                    Coincidir("GROUP");                     //Group
-                                    Coincidir("BY");                        //Group
-                                    G();                                    //METODO
-                                }
-                            }
-                            if (Contador < Palabras.length) {
-                                if("HAVING".equals(Preanalisis)){
-                                    Coincidir("HAVING");                     //HAVING
-                                    H();                                    //METODO
-                                }
-                            }
-                            if (Contador < Palabras.length) {
-                                if("ORDER".equals(Preanalisis)){
-                                    Coincidir("ORDER");                     //ORDER
-                                    Coincidir("BY");                        //BY
-                                    O();                                    //METODO
-                                }
-                            }
-                            if ((Contador < Palabras.length)) 
-                                Reportar(Preanalisis);                      //No debe haber sentencias luego de las enlistadas anteriormente
-                            break;
                         case "INSERT":
                             Coincidir("INSERT");
                             S2();                                               //TOP PERCENT
@@ -264,81 +204,9 @@ public class minisql extends javax.swing.JFrame {
                             }
                             Coincidir(")");
                             break;
-                        case "UPDATE":
-                            Coincidir("UPDATE");
-                            S2();                                               //TOP PERCENT
-                            INSERT1();                                          //Tabla donde se insertaran los datos
-                            Coincidir("SET");
-                            UPDATE1();
-                            Output();
-                            if ("FROM".equals(Preanalisis)) {
-                                Coincidir("FROM");
-                                F1();                           //METODO FROM
-
-                                if (Contador < Palabras.length) {
-                                    switch(Preanalisis){
-                                        case "INNER":
-                                            CoincidirTipo("RESERVADAS");            //INNER
-                                            J1();                                   //RESTO DEL JOIN
-                                            break;
-                                        case "LEFT":case "RIGHT":case "FULL":
-                                            CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-
-                                            if ("OUTER".equals(Preanalisis)){       //OUTER
-                                               Coincidir("OUTER");                              
-                                            }
-                                            J1();                                   //Resto del JOIN
-                                            break;
-                                        case "JOIN":
-                                            J1();
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                            if ("WHERE".equals(Preanalisis)) {
-                                Coincidir("WHERE");                     //WHERE
-                                W();                                    //METODO
-                            }
-                            break;
-                        case "DELETE":
-                            Coincidir("DELETE");
-                            S2();      
-
-                            if ("OUTPUT".equals(Preanalisis)) {
-                                Output();
-                            }
-                            if ("FROM".equals(Preanalisis)) {
-                                Coincidir("FROM");
-                                F1();                           //METODO FROM
-
-                                if (Contador < Palabras.length) {
-                                    switch(Preanalisis){
-                                        case "INNER":
-                                            CoincidirTipo("RESERVADAS");            //INNER
-                                            J1();                                   //RESTO DEL JOIN
-                                            break;
-                                        case "LEFT":case "RIGHT":case "FULL":
-                                            CoincidirTipo("RESERVADAS");            //LEFT|RIGHT|FULL
-
-                                            if ("OUTER".equals(Preanalisis)){       //OUTER
-                                               Coincidir("OUTER");                              
-                                            }
-                                            J1();                                   //Resto del JOIN
-                                            break;
-                                        case "JOIN":
-                                            J1();
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                            if ("WHERE".equals(Preanalisis)) {
-                                Coincidir("WHERE");                     //WHERE
-                                W();                                    //METODO
-                            }
+                        case "OPEN":case "CLOSE":case "DEALLOCATE":
+                            CoincidirTipo("RESERVADAS");
+                            //Debemos de validar que se encuentre denttro de nuestra tabla de simbolos y que sea de tipo CURSOR
                             break;
                         case "CREATE":
                             Coincidir("CREATE");                     //CREATE
@@ -348,51 +216,93 @@ public class minisql extends javax.swing.JFrame {
                                     INSERT1();
                                     Coincidir("(");
                                     CreateTable1();
-
                                     break;
-                                default:break;
+                                default:
+                                    break;
                             }
+                            break;
+                        case "TRUNCATE":
+                            Coincidir("TRUNCATE");
+                            Coincidir("TABLE");
+                            //Aquí consumimos el nombre de la tabla
                             break;
                         case "DECLARE":
                             Queue<String> stack = new LinkedList();
                             Coincidir("DECLARE");
-                            stack.add(Preanalisis);
-                            CoincidirTipo("VARIABLE");
-                            if ("AS".equals(Preanalisis)) {
-                                Coincidir("AS");
-                            }
-                            if (",".equals(Preanalisis)) {
-                                do{
-                                    Coincidir(",");
-                                    stack.add(Preanalisis);
-                                    if ("AS".equals(Preanalisis)) {
-                                        Coincidir("AS");
+                            
+                            if ("VARIABLE".equals(TipoToken)) {
+                                stack.add(Preanalisis);
+                                CoincidirTipo("VARIABLE");
+                                if ("AS".equals(Preanalisis)) {
+                                    Coincidir("AS");
+                                }
+                                if (",".equals(Preanalisis)) {
+                                    do{
+                                        Coincidir(",");
+                                        stack.add(Preanalisis);
+                                        if ("AS".equals(Preanalisis)) {
+                                            Coincidir("AS");
+                                        }
+                                        CoincidirTipo("VARIABLE");
+                                    }while(",".equals(Preanalisis));
+                                }
+
+                                if ("DATATYPE".equals(TipoToken)) {
+                                    if (stack.isEmpty()) {
+                                        Reportar("No se ha declarado ninguna variable");
                                     }
-                                    CoincidirTipo("VARIABLE");
-                                }while(",".equals(Preanalisis));
+                                    else{
+                                        String auxX = Preanalisis;
+                                        CoincidirTipo("DATATYPE");
+                                        if ("(".equals(Preanalisis)) {
+                                            auxX += "(";
+                                            Coincidir("(");
+                                            if ("ENTERO".equals(TipoToken)) {
+                                                auxX += Preanalisis + ")";
+                                                CoincidirTipo("ENTERO");
+                                                Coincidir(")");
+                                            }else if ("MAX".equals(Preanalisis) ||  "MIN".equals(Preanalisis)) {
+                                                auxX += Preanalisis + ")";
+                                                CoincidirTipo("RESERVADAS");
+                                                Coincidir(")");
+                                            }
+                                        }
+                                        while(!stack.isEmpty()){
+                                            TS.put(stack.remove(), new Valor(auxX));
+                                        }
+                                    }
+                                }
+                            }
+                            else if ("IDENTIFICADOR".equals(TipoToken)) {
+                                stack.add(Preanalisis);
+                                CoincidirTipo("IDENTIFICADOR");
+                                Coincidir("CURSOR");
+                                Coincidir("FOR");
+                                Coincidir("SELECT");
+                                if ("IDENTIFICADOR".equals(TipoToken)) {
+                                    
+                                }else{
+                                    
+                                }
                             }
                             
-                            if ("DATATYPE".equals(TipoToken)) {
-                                if (stack.isEmpty()) {
-                                    Reportar("No se ha declarado ninguna variable");
-                                }
-                                else{
-                                    while(!stack.isEmpty()){
-                                        TS.put(stack.remove(), new Valor(Preanalisis));
-                                    }
-                                    CoincidirTipo("DATATYPE");
-                                }
-                            }
                             break;
                         case "SET":
                             Coincidir("SET");
                             Valor auxili = (Valor) TS.get(Preanalisis);
-                            switch(auxili.getTipo()){
+                            String auxiliar11 = auxili.getTipo();
+                            if (auxiliar11.contains("(")) {
+                                auxiliar11 = auxiliar11.substring(0, auxiliar11.indexOf("("));
+                            }
+                            switch(auxiliar11){
                                 case "INT":
                                     SetInt(Preanalisis, auxili);
                                     break;
                                 case "FLOAT":
                                     SetFloat(Preanalisis, auxili);
+                                    break;
+                                case "VARCHAR":
+                                    SetVarchar(Preanalisis, auxili);
                                     break;
                                 default:
                                     Reportar("Se esperaba una variable." + Preanalisis);
@@ -875,6 +785,63 @@ public class minisql extends javax.swing.JFrame {
         Valor nuevoValor = new Valor(value.getTipo());
         nuevoValor.setValor(listaFinal.pop());
         TS.put(preanalis, nuevoValor);
+    }
+    
+    private void SetVarchar(String preanalis, Valor value){
+        String SizeNvarchar = value.getTipo();
+        if (SizeNvarchar.contains("(")) {
+            //Entonces tiene tamaño predefinido o es MAX
+            if (SizeNvarchar.contains("MAX")) {
+                //Dele sin pena mijo
+                CoincidirTipo("VARIABLE");
+                Coincidir("=");
+                //Hacer un loop
+                String nuevoValor = "";
+                boolean ingresar = true;
+                while(haySiguiente()){
+                    switch (TipoToken){
+                        case "CADENA":
+                            if (ingresar == true) {
+                                nuevoValor += Preanalisis.substring(1,Preanalisis.lastIndexOf("'"));
+                                CoincidirTipo("CADENA");
+                                ingresar = false;
+                            }else{
+                             Reportar("Se esperaba un signo y no una cadena");   
+                            }
+                            break;
+                        case "CARACTERES":
+                            if (ingresar == false) {
+                                Coincidir("+");
+                                ingresar = true;
+                            }else{
+                                Reportar("Se esperaba una cadena o una variable y no un signo");
+                            }
+                            break;
+                        case "VARIABLE":
+                            if (ingresar == true) {
+                                
+                                
+                                ingresar = false;
+                            }else{
+                             Reportar("Se esperaba un signo y no una cadena");   
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                TS.remove(preanalis);
+                Valor nuevValor = new Valor(value.getTipo());
+                nuevValor.setValor(nuevoValor);
+                TS.put(preanalis, nuevValor);
+            }else{
+                //Hay que calcular el nuevo valor mijo
+                
+            }
+        }else{
+            //Solo es una letra
+            
+        }
     }
     
     public List<String> Postfijo(){
