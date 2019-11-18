@@ -192,9 +192,6 @@ public class minisql extends javax.swing.JFrame {
                                 INSERT2();                                      //Todas las posibles columnas
                                 Coincidir(")");
                             }
-                            if ("OUTPUT".equals(Preanalisis)) {
-                                 Output();
-                            }
                             Coincidir("VALUES");
                             Coincidir("(");
                             Expresiones();                                               //HOUSTON PROBLEMAS
@@ -204,7 +201,7 @@ public class minisql extends javax.swing.JFrame {
                             }
                             Coincidir(")");
                             break;
-                        case "OPEN":case "CLOSE":case "DEALLOCATE":
+                        case "OPEN":case "CLOSE":case "DEALLOCATE":             //Cursores
                             CoincidirTipo("RESERVADAS");
                             //Debemos de validar que se encuentre denttro de nuestra tabla de simbolos y que sea de tipo CURSOR
                             break;
@@ -213,9 +210,9 @@ public class minisql extends javax.swing.JFrame {
                             switch(Preanalisis){
                                 case "TABLE":
                                     Coincidir("TABLE");
-                                    INSERT1();
+                                    String nombreTabla = INSERT1();
                                     Coincidir("(");
-                                    CreateTable1();
+                                    CreateTable1(nombreTabla);
                                     break;
                                 default:
                                     break;
@@ -224,6 +221,13 @@ public class minisql extends javax.swing.JFrame {
                         case "TRUNCATE":
                             Coincidir("TRUNCATE");
                             Coincidir("TABLE");
+                            String tabla = Preanalisis;
+                            CoincidirTipo("IDENTIFICADOR");
+                            
+                            Valor eh = (Valor) TS.get(tabla);
+                            if (eh == null || !eh.getTipo().equals("TABLE")) //No existe dicha tabla o no es una tabla
+                                Reportar("La tabla no existe o el objeto no es una tabla. " + tabla);
+                            
                             //Aquí consumimos el nombre de la tabla
                             break;
                         case "DECLARE":
@@ -273,7 +277,7 @@ public class minisql extends javax.swing.JFrame {
                                     }
                                 }
                             }
-                            else if ("IDENTIFICADOR".equals(TipoToken)) {
+                            else if ("IDENTIFICADOR".equals(TipoToken)) { //Se trata de un CURSOR
                                 stack.add(Preanalisis);
                                 CoincidirTipo("IDENTIFICADOR");
                                 Coincidir("CURSOR");
@@ -524,17 +528,24 @@ public class minisql extends javax.swing.JFrame {
     /**
      * Tablas del INSERT ID.ID.ID | ID.ID | ID
      */
-    private void INSERT1(){
-        CoincidirTipo("IDENTIFICADOR");                 //ID
+    private String INSERT1(){
+        String identificador;
+        identificador = Preanalisis;
+        CoincidirTipo("IDENTIFICADOR");                 //Database || Schema || Table
         if (".".equals(Preanalisis)) {
             Coincidir(".");
-            CoincidirTipo("IDENTIFICADOR");             //ID.ID
+            identificador = Preanalisis;
+            CoincidirTipo("IDENTIFICADOR");             //Schemma || Table
             
             if (".".equals(Preanalisis)) {
                 Coincidir(".");
-                CoincidirTipo("IDENTIFICADOR");         //ID.ID.ID
+                identificador = Preanalisis;
+                CoincidirTipo("IDENTIFICADOR");         //Table
             }
         }
+        Valor valor = new Valor("TABLE");
+        TS.put(identificador, valor);
+        return identificador;
     }
     
     private void INSERT2(){
@@ -819,7 +830,7 @@ public class minisql extends javax.swing.JFrame {
                             break;
                         case "VARIABLE":
                             if (ingresar == true) {
-                                
+                                //Pendient3 d3 3v0luc10n j1j1
                                 
                                 ingresar = false;
                             }else{
@@ -913,36 +924,29 @@ public class minisql extends javax.swing.JFrame {
     /**
      * Metodo para devolver ID, DATATYPE
      */
-    private void CreateTable1(){
-        CoincidirTipo("IDENTIFICADOR");
-
-        switch(Preanalisis){
-            case"CHAR":case"BINARY":case"BLOP":case"BIT":case"SMALLINT":case"INT":case"INTEGER":case"FLOAT":case"VARCHAR":
-            case"NVARCHAR":case"NCHAR":
-                CoincidirTipo("RESERVADAS");
-                if ("(".equals(Preanalisis)) {
-                    Coincidir("(");
-                    if ("ENTERO".equals(TipoToken)) {
-                        CoincidirTipo("ENTERO");
-
-                    } else if ("MAX".equals(Preanalisis) || "MIN".equals(Preanalisis)) {
-                        CoincidirTipo("RESERVADAS");
-                    } else{
-                        Reportar(Preanalisis);
-                    }
-                    Coincidir(")");
-                }
-
-                //Coincidir
-                break;
-                case"BOOLEAN":case"DATE":case"BLOB":case"YEAR":case"IMAGE":case"REAL":case"TIME":case"TIMESTAMP":
-                case"CURSOR":case"TABLE":case"TEXT":case"BYTE":case"LONG":case"DOUBLE":
-                    CoincidirTipo("RESERVADAS");
-                    break;
-                default:
-                    Reportar(Preanalisis);
-                    break;
+    private void CreateTable1(String nombreTable){
+        ArrayList hola = new ArrayList<>();
+        String hola2 = "";
+        while(haySiguiente() || !")".equals(Preanalisis)){
+            if (",".equals(Preanalisis)) {
+                hola2 = hola2.trim();
+                hola.add(hola2);
+                hola2="";
+                Coincidir(Preanalisis);
+            }else{
+                hola2 += Preanalisis + " ";
+                Coincidir(Preanalisis);
+            }
         }
+        if (!hola2.isEmpty()) {
+            hola2 = hola2.trim();
+            hola.add(hola2);
+        }
+        Coincidir(")");
+        Valor value = (Valor) TS.get(nombreTable);
+        value.setValor(hola);
+        TS.remove(nombreTable);
+        TS.put(nombreTable, value);
     }
     
     private void UPDATE1(){
@@ -950,15 +954,13 @@ public class minisql extends javax.swing.JFrame {
         Coincidir("=");
         if ("DEFAULT".equals(Preanalisis) || "NULL".equals(Preanalisis)) {
             CoincidirTipo("RESERVADAS");
-        }else{
+        }else
             Expresiones();                                                   //EXPRESIONES
-        }
         
         if (",".equals(Preanalisis)) {
             Coincidir(",");
             UPDATE1();
         }
-        
     }
     
     /**
@@ -1091,11 +1093,8 @@ public class minisql extends javax.swing.JFrame {
                 break;
             case "IS":
                 Coincidir("IS");
-                
-                if ("NOT".equals(Preanalisis)) {
+                if ("NOT".equals(Preanalisis)) 
                     Coincidir("NOT");
-                }
-                
                 Coincidir("NULL");
                 break;
             case "LIKE":
@@ -1197,7 +1196,6 @@ public class minisql extends javax.swing.JFrame {
             TokenError += text + "\n";
             throw e;
         }
-        
     }
     
     /**
