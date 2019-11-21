@@ -124,7 +124,12 @@ public class minisql extends javax.swing.JFrame {
     private String TokenError = "";
     public String[] arreglo = new String[2];
     public Dictionary TS = new Hashtable();
-    
+    private String try1="";
+    private String[] toInsert;
+    private String validC="";
+    private String sequence=""; 
+    private String sequenceTI = "";
+    private int status= 0;
     private void btnCargarSQLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarSQLActionPerformed
         // TODO add your handling code here:
         
@@ -183,30 +188,86 @@ public class minisql extends javax.swing.JFrame {
                 try{                
                     switch(Preanalisis){
                         case "INSERT":
+                            
                             Coincidir("INSERT");
                             S2();                                               //TOP PERCENT
                             Coincidir("INTO");
-                            INSERT1();                                          //Tabla donde se insertaran los datos
+                           String tableName =  INSERT1();                                          //Tabla donde se insertaran los datos
                             if ("(".equals(Preanalisis)) {                      //Cuando la persona primer elige el orden de las columnas
                                 Coincidir("(");
                                 INSERT2();                                      //Todas las posibles columnas
-                                Coincidir(")");
+                                toInsert = try1.split("-");
+                                Valor nuevo= (Valor)TS.get(tableName) ;
+                                ArrayList columnas = (ArrayList) nuevo.getValor();
+                                String[] te = validC.split(",");
+                                String[] hw = validC.split(" ");
+                                for (int i = 0; i < toInsert.length; i++) {
+                                    if (validC.contains(toInsert[i]))
+                                    {
+                                      
+                                    }
+                                    else
+                                    {
+                                        Reportar("La columna ingresada no es valida");
+                                    }
+                                    
+                                }
+                                for (int i = 0; i < hw.length; i++) {
+                                      if(hw[i].contains("int") && hw[i].contains(toInsert[i]))
+                                        {
+                                            sequenceTI+="2";
+                                        }
+                                        if(hw[i].contains("varchar")&& hw[i].contains(toInsert[i])|| hw[i].contains("nvarchar")&& hw[i].contains(toInsert[i]))
+                                        {
+                                            sequenceTI+="1";
+                                        }
+                                    
+                                }
+                                    
+                                Coincidir(")");                              
+                                
+                            }
+                            else 
+                            {
+                                String[] hw = validC.split(" ");
+                                  for (int i = 0; i < hw.length; i++) {
+                                      if(hw[i].contains("int"))
+                                        {
+                                            sequenceTI+="2";
+                                        }
+                                        if(hw[i].contains("varchar")|| hw[i].contains("nvarchar"))
+                                        {
+                                            sequenceTI+="1";
+                                        }
+                                    
+                                }
                             }
                             Coincidir("VALUES");
                             Coincidir("(");
+                            
                             Expresiones();                                               //HOUSTON PROBLEMAS
                             while(",".equals(Preanalisis)){
-                                Coincidir(",");
-                                Expresiones();
-                            }
+                                Coincidir(",");                              
+                                Expresiones();  
+                                    }
+                            
+                             if(sequence.equals(sequenceTI) )
+                                {
+                                   // Succes !
+                                }
+                                else
+                                {
+                                 Reportar("No coinciden los valores a insertar");
+                                }
+
                             Coincidir(")");
                             break;
                         case "OPEN":case "CLOSE":case "DEALLOCATE":             //Cursores
                             CoincidirTipo("RESERVADAS");
                             //Debemos de validar que se encuentre denttro de nuestra tabla de simbolos y que sea de tipo CURSOR
                             break;
-                        case "CREATE":
-                            Coincidir("CREATE");                     //CREATE
+                        case "CREATE":      
+                                Coincidir("CREATE");                     //CREATE
                             switch(Preanalisis){
                                 case "TABLE":
                                     Coincidir("TABLE");
@@ -340,6 +401,10 @@ public class minisql extends javax.swing.JFrame {
         }
     }
     
+    
+    
+    
+    
     /**
      * EXPRESSIONES
      */
@@ -348,23 +413,23 @@ public class minisql extends javax.swing.JFrame {
             case "IDENTIFICADOR":
                 CoincidirTipo("IDENTIFICADOR");                 //Posible columna
                 ID2();                                          //En caso de que lo anterior sea Tabla
-                W4();
+               
                 break;
             case "CADENA":
                 CoincidirTipo("CADENA");
-                W4();
+                W4(1);
                 break;
             case "ENTERO":
                 CoincidirTipo("ENTERO");
-                W4();
+                W4(2);
                 break;
             case "DECIMAL":
                 CoincidirTipo("DECIMAL");
-                W4();
+                W4(3);
                 break;
             case "FLOAT":
                 CoincidirTipo("FLOAT");
-                W4();
+                W4(3);
                 break;
             case "CARACTERES":
                 switch(Preanalisis){
@@ -548,14 +613,31 @@ public class minisql extends javax.swing.JFrame {
         return identificador;
     }
     
-    private void INSERT2(){
+    private void INSERT2(){ //Nombre de las columnas de la tabla
+        String test1 = Preanalisis;
         CoincidirTipo("IDENTIFICADOR");
         if (",".equals(Preanalisis)) {
+            try1+= "-"+test1;
+            
             Coincidir(",");
             INSERT2();
         }
     }
     
+    private Boolean isCharacter(String letter)
+    {
+       String characters=";|,|(|)";
+       String[] carray = characters.split("|");
+       
+       for( String ch: carray)
+       {
+           if(letter.contains(ch))
+           {
+           return true;
+           }
+       }
+       return false;
+    }
     /**
      * Metodo para consumir desde JOIN hasta la ultima columna relacionada
      */
@@ -915,6 +997,7 @@ public class minisql extends javax.swing.JFrame {
                     break;
             }
         }
+        
         while(!cola.empty()){
             lista.add(cola.pop());
         }
@@ -944,6 +1027,7 @@ public class minisql extends javax.swing.JFrame {
         }
         Coincidir(")");
         Valor value = (Valor) TS.get(nombreTable);
+        validC+= hola;
         value.setValor(hola);
         TS.remove(nombreTable);
         TS.put(nombreTable, value);
@@ -1051,15 +1135,9 @@ public class minisql extends javax.swing.JFrame {
     /**
      * SIGNOS
      */
-    private void W4(){
-        switch(Preanalisis){
-            case "+":case "-":case "*":case "/":case "%":
-                CoincidirTipo("CARACTERES");
-                Expresiones();
-                break;
-            default:
-                break;
-        }
+    private void W4(int s){
+    sequence+= String.valueOf(s);
+        
     }
     
     /**

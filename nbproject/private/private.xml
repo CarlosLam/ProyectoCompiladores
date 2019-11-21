@@ -3,7 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Carlos/Documents/GitHub/ProyectoCompiladores/src/codigo/minisql.java</file>
+            <file>file:/D:/U/2%20do%20ciclo%202019/Compis/ProyectoCompiladores/src/codigo/Lexer.flex</file>
+            <file>file:/D:/U/2%20do%20ciclo%202019/Compis/ProyectoCompiladores/src/codigo/Tokens.java</file>
+            <file>file:/D:/U/2%20do%20ciclo%202019/Compis/ProyectoCompiladores/src/codigo/minisql.java</file>
+            <file>file:/D:/U/2%20do%20ciclo%202019/Compis/ProyectoCompiladores/src/codigo/Lexer.java</file>
+            <file>file:/D:/U/2%20do%20ciclo%202019/Compis/ProyectoCompiladores/src/codigo/Valor.java</file>
         </group>
     </open-files>
 </project-private>
