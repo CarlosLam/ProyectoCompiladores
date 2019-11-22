@@ -6,20 +6,26 @@
 package codigo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -188,7 +194,6 @@ public class minisql extends javax.swing.JFrame {
                 try{                
                     switch(Preanalisis){
                         case "INSERT":
-                            
                             Coincidir("INSERT");
                             S2();                                               //TOP PERCENT
                             Coincidir("INTO");
@@ -213,14 +218,17 @@ public class minisql extends javax.swing.JFrame {
                                     
                                 }
                                 for (int i = 0; i < hw.length; i++) {
-                                      if(hw[i].contains("int") && hw[i].contains(toInsert[i]))
+                                    for (int j = 0; j < toInsert.length; j++) {
+                                    
+                                      if(hw[i].contains("int") && hw[i].contains(toInsert[j]))
                                         {
                                             sequenceTI+="2";
                                         }
-                                        if(hw[i].contains("varchar")&& hw[i].contains(toInsert[i])|| hw[i].contains("nvarchar")&& hw[i].contains(toInsert[i]))
+                                        if(hw[i].contains("varchar")&& hw[i].contains(toInsert[j])|| hw[i].contains("nvarchar")&& hw[i].contains(toInsert[j]))
                                         {
                                             sequenceTI+="1";
                                         }
+                                    }
                                     
                                 }
                                     
@@ -271,7 +279,8 @@ public class minisql extends javax.swing.JFrame {
                             switch(Preanalisis){
                                 case "TABLE":
                                     Coincidir("TABLE");
-                                    String nombreTabla = INSERT1();
+                                    String nombreTabla = Preanalisis;
+                                    CoincidirTipo("IDENTIFICADOR");
                                     Coincidir("(");
                                     CreateTable1(nombreTabla);
                                     break;
@@ -339,18 +348,52 @@ public class minisql extends javax.swing.JFrame {
                                 }
                             }
                             else if ("IDENTIFICADOR".equals(TipoToken)) { //Se trata de un CURSOR
-                                stack.add(Preanalisis);
+                                String nombreCursor =  Preanalisis;
                                 CoincidirTipo("IDENTIFICADOR");
                                 Coincidir("CURSOR");
                                 Coincidir("FOR");
                                 Coincidir("SELECT");
                                 if ("IDENTIFICADOR".equals(TipoToken)) {
-                                    
+                                    CreateCursor(nombreCursor);
                                 }else{
                                     
                                 }
                             }
                             
+                            break;
+                        case "BEGIN":
+                            Coincidir("BEGIN");
+                            Coincidir("TRANSACTION");
+                            if ("IDENTIFICADOR".equals(TipoToken)) {
+                                String transaction = Preanalisis;
+                                CoincidirTipo("IDENTIFICADOR");
+                                TS.put(transaction, new Valor("TRANSACTION"));
+                            }else{
+                                TS.put("TRANSACTION", new Valor("TRANSACTION"));
+                            }
+                            break;
+                        case "USE":
+                            Coincidir("USE");
+                            Coincidir("DATABASE");
+                            String nombreDataBase = Preanalisis;
+                            CoincidirTipo("IDENTIFICADOR");
+                            
+                            if (!TS.isEmpty()) {
+                                //Debemos sacar uno a uno y eliminarlo despues
+                                List<String> keys = Collections.list(TS.keys());
+                                Map<String, Object> dictCopy = keys.stream()
+                               .collect(Collectors.toMap(Function.identity(), TS::get)); 
+
+                        for (Map.Entry<String, Object> entry : dictCopy.entrySet()) {
+                       String s  = entry.getKey();
+                        String a = (String) entry.getValue(); //System.out.println(entry.getKey() + " = " + entry.getValue());
+                        }
+                                       
+                                    
+
+                            }
+                            Valor value12 = new Valor("DATABASE");
+                            TS.put(nombreDataBase, value12);
                             break;
                         case "SET":
                             Coincidir("SET");
@@ -383,10 +426,41 @@ public class minisql extends javax.swing.JFrame {
             if (errores == 0) {
                 //txtRespuesta.setText("");
                 JOptionPane.showMessageDialog(null, "No se ha encontrado ningun error");
+                
             }
             else{
                 //Sino llenamos de informacion el txtRespuesta
                 txtRespuesta.setText(TokenError);
+                
+            }
+            //CREACION DE ARCHIVO FINAL
+           String resultado="";
+                        if (!TS.isEmpty()) {
+                                //Debemos sacar uno a uno y eliminarlo despues
+                                List<String> keys = Collections.list(TS.keys());
+                                Map<String, Object> dictCopy = keys.stream()
+                               .collect(Collectors.toMap(Function.identity(), TS::get)); 
+
+                        for (Map.Entry<String, Object> entry : dictCopy.entrySet()) {
+                       String s  = entry.getKey();
+                        String a = entry.getValue().toString(); //System.out.println(entry.getKey() + " = " + entry.getValue());
+                        resultado+= s +" $ "+ a +"\n"; 
+                        }
+
+                            }
+             File n = new File("C:\\Users\\Max Diaz\\Desktop\\resultado.txt");
+             FileWriter TextOut;
+            try {
+                if(!n.exists()){
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(n));
+                    bw.close();
+                }
+                TextOut = new FileWriter(n, false);
+                TextOut.write(resultado + "\r\n");
+                TextOut.close();
+            
+            } catch (IOException ex) {
+                Logger.getLogger(minisql.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_btnCargarSQLActionPerformed
@@ -609,7 +683,7 @@ public class minisql extends javax.swing.JFrame {
             }
         }
         Valor valor = new Valor("TABLE");
-        TS.put(identificador, valor);
+        //TS.put(identificador, valor);
         return identificador;
     }
     
@@ -1026,12 +1100,38 @@ public class minisql extends javax.swing.JFrame {
             hola.add(hola2);
         }
         Coincidir(")");
-        Valor value = (Valor) TS.get(nombreTable);
         validC+= hola;
+        Valor value = new Valor("TABLE");
         value.setValor(hola);
-        TS.remove(nombreTable);
         TS.put(nombreTable, value);
     }
+    
+    
+    private void CreateCursor(String nombreTable){
+        ArrayList hola = new ArrayList<>();
+        String hola2 = "";
+        while(!"FROM".equals(Preanalisis)){
+            if (",".equals(Preanalisis)) {
+                hola2 = hola2.trim();
+                hola.add(hola2);
+                hola2="";
+                Coincidir(Preanalisis);
+            }else{
+                hola2 += Preanalisis + " ";
+                Coincidir(Preanalisis);
+            }
+        }
+        if (!hola2.isEmpty()) {
+            hola2 = hola2.trim();
+            hola.add(hola2);
+        }
+        Coincidir("FROM");
+        validC+= hola;
+        Valor value = new Valor("CURSOR");
+        value.setValor(hola);
+        TS.put(nombreTable, value);
+    }
+    
     
     private void UPDATE1(){
         CoincidirTipo("IDENTIFICADOR");
